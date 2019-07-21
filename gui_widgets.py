@@ -17,7 +17,7 @@
 
 """
 =======================================================
-**interface_widgets.py**: graphical widgets for the GUI
+**gui_widgets.py**: graphical widgets for the GUI
 =======================================================
 """
 
