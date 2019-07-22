@@ -21,10 +21,7 @@
 """
 
 import sys, pygame
-import time
-import subprocess
 import os
-import glob
 import mpd
 from collections import deque
 from mutagen import File
@@ -37,8 +34,8 @@ MPD_TYPE_SONGS = 'title'
 DEFAULT_COVER = 'default_cover_art.png'
 TEMP_PLAYLIST_NAME = '_pi-jukebox_temp'
 
-reload(sys)
-sys.setdefaultencoding('utf8')
+# reload(sys)
+# sys.setdefaultencoding('utf8')
 
 
 class MPDNowPlaying(object):
