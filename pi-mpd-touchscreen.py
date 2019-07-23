@@ -85,7 +85,7 @@ def main():
     # Check whether mpd is running and get it's status
     if not mpd.connect():
         print("Couldn't connect to the mpd server " + mpd.host + " on port " + str(
-            mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'sudo service mpd status'.")
+            mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
         sys.exit()
     mpd.status_get()  # Get mpd status
     #screens = PiJukeboxScreens()  # Screens
