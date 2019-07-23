@@ -33,33 +33,33 @@ from mpd_client import *
 # from screen_settings import *
 
 
-# class PiJukeboxScreens(ScreenControl):
-#     """ Manages Pi Jukebox's main screens.
-#             - Player screen
-#             - Library screen
-#         Handles screen switching, clicking and swiping and displaying mpd status
-#         updates on screen(s)
-#     """
-#     def __init__(self):
-#         ScreenControl.__init__(self)
-#
-#         #self.add_screen(ScreenPlaying(SCREEN), self.loop_hook)  # Screen with now playing and cover art
-#         #self.add_screen(ScreenPlaylist(SCREEN), self.loop_hook)  # Create player with playlist screen
-#         #self.add_screen(ScreenLibrary(SCREEN), self.loop_hook)  # Create library browsing screen
-#         #self.add_screen(ScreenDirectory(SCREEN), self.loop_hook)  # Create directory browsing screen
-#         #self.add_screen(ScreenRadio(SCREEN), self.loop_hook)  # Create radio station managing screen
-#
-#     def mpd_updates(self):
-#         """ Updates a current screen if it shows mpd relevant content. """
-#         #self.screen_list[self.current_index].update()
-#
-#     def loop_hook(self):
-#         #return mpd.status_get()
-#
-#     def update(self):
-#         #pass
-#
-#
+class PiJukeboxScreens(ScreenControl):
+    """ Manages Pi Jukebox's main screens.
+            - Player screen
+            - Library screen
+        Handles screen switching, clicking and swiping and displaying mpd status
+        updates on screen(s)
+    """
+    def __init__(self):
+        ScreenControl.__init__(self)
+
+        #self.add_screen(ScreenPlaying(SCREEN), self.loop_hook)  # Screen with now playing and cover art
+        #self.add_screen(ScreenPlaylist(SCREEN), self.loop_hook)  # Create player with playlist screen
+        #self.add_screen(ScreenLibrary(SCREEN), self.loop_hook)  # Create library browsing screen
+        #self.add_screen(ScreenDirectory(SCREEN), self.loop_hook)  # Create directory browsing screen
+        #self.add_screen(ScreenRadio(SCREEN), self.loop_hook)  # Create radio station managing screen
+
+    def mpd_updates(self):
+        """ Updates a current screen if it shows mpd relevant content. """
+        self.screen_list[self.current_index].update()
+
+    def loop_hook(self):
+        return mpd.status_get()
+
+    def update(self):
+        pass
+
+
 # def apply_settings():
 #     # Check for first time settings
 #     if not config_file.setting_exists('MPD Settings', 'music directory'):
@@ -88,7 +88,7 @@ def main():
             mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
         sys.exit()
     mpd.status_get()  # Get mpd status
-    #screens = PiJukeboxScreens()  # Screens
+    screens = PiJukeboxScreens()  # Screens
     #screens.show()  # Display the screen
 
     pygame.init()
