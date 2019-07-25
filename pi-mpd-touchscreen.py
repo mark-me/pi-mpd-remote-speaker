@@ -22,7 +22,7 @@ __author__ = 'Mark Zwart'
 import sys, pygame
 from time import sleep
 from pygame import *
-# from gui_screens import *
+from gui_screens import *
 # from config_file import *
 # from settings import *
 from mpd_client import *
