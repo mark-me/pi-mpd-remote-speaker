@@ -26,7 +26,7 @@ from gui_screens import *
 # from config_file import *
 # from settings import *
 from mpd_client import *
-# from screen_player import *
+from screen_player import *
 # from screen_library import *
 # from screen_directory import *
 # from screen_radio import *
@@ -43,7 +43,7 @@ class PiJukeboxScreens(ScreenControl):
     def __init__(self):
         ScreenControl.__init__(self)
 
-        #self.add_screen(ScreenPlaying(SCREEN), self.loop_hook)  # Screen with now playing and cover art
+        self.add_screen(ScreenPlaying(SCREEN), self.loop_hook)  # Screen with now playing and cover art
         #self.add_screen(ScreenPlaylist(SCREEN), self.loop_hook)  # Create player with playlist screen
         #self.add_screen(ScreenLibrary(SCREEN), self.loop_hook)  # Create library browsing screen
         #self.add_screen(ScreenDirectory(SCREEN), self.loop_hook)  # Create directory browsing screen
@@ -89,7 +89,7 @@ def main():
         sys.exit()
     mpd.status_get()  # Get mpd status
     screens = PiJukeboxScreens()  # Screens
-    #screens.show()  # Display the screen
+    screens.show()  # Display the screen
 
     pygame.init()
     sleep(0.2)

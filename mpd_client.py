@@ -23,9 +23,9 @@
 import sys, pygame
 import os
 import mpd
+import subprocess
 from collections import deque
 from mutagen import File
-
 
 MPD_TYPE_ARTIST = 'artist'
 MPD_TYPE_ALBUM = 'album'
@@ -71,6 +71,7 @@ class MPDNowPlaying(object):
             else:
                 self.title = os.path.splitext(os.path.basename(now_playing['file']))[0]
             if self.playing_type == 'file':
+                self.music_directory = subprocess.check_output(['mpc', 'mount']).decode("utf-8") .strip()
                 if 'artist' in now_playing:
                     self.artist = now_playing['artist']  # Artist of current song
                 else:
@@ -114,7 +115,7 @@ class MPDNowPlaying(object):
         if self.file == "" or self.playing_type == 'radio':
             return DEFAULT_COVER
         try:
-            music_file = File(self.music_directory + self.file)
+            music_file = File(self.music_directory + "/" + self.file)
         except IOError:
             return DEFAULT_COVER
         cover_art = None
@@ -201,6 +202,9 @@ class MPDController(object):
         except Exception:
             pass
         self.__starts_with_radio()
+        lst_mounts = self.mpd_client.listmounts()
+        self.__music_directory = subprocess.check_output(['mpc', 'mount']).strip()
+
         # See if currently playing is radio station
         return True
 
@@ -208,7 +212,7 @@ class MPDController(object):
         was_playing = False  # Indicates whether mpd was playing on start
         now_playing = MPDNowPlaying()
         try:
-            now_playing.now_playing_set(self.mpd_client.currentsong())  # Get currenly plating info
+            now_playing.now_playing_set(self.mpd_client.currentsong())  # Get currently plating info
         except mpd.ConnectionError:
             self.mpd_client.connect(self.host, self.port)
             now_playing.now_playing_set(self.mpd_client.currentsong())

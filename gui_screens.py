@@ -52,6 +52,7 @@ ICO_ERROR = RESOURCES + 'icon_warning.png'
 #: Time-out period before screen goes blank (milliseconds)
 BLANK_PERIOD = 300000
 
+
 class GestureDetector(object):
     """ Class for detecint mouse gestures
     """
@@ -184,7 +185,6 @@ class Screen(object):
         self.timer = pygame.time.get_ticks
         self.blank_screen_time = self.timer() + BLANK_PERIOD
 
-
     def add_component(self, widget):
         """ Adds components to component list, thus ensuring a component is found on a mouse event.
 
@@ -304,6 +304,7 @@ class Screen(object):
             if value.visible:
                 value.draw()
         pygame.display.flip()
+
 
 class ScreenModal(Screen):
     """ Screen with its own event capture loop.

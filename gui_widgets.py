@@ -30,9 +30,6 @@ import math
 from settings import *
 # import Image
 
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 # Alignment variables
 HOR_LEFT = 0
 HOR_MID = 1
@@ -290,8 +287,8 @@ class LabelText(Widget):
         self.indent_vertical = vert_indent
 
     def text_set(self, text):
-        if self.caption != text.decode('utf-8'):
-            self.caption = text.decode('utf-8')
+        if self.caption != text:
+            self.caption = text
             self.draw()
 
     def draw(self):
@@ -301,7 +298,6 @@ class LabelText(Widget):
 
             :return: Text that couldn't be fitted inside the label's rectangle,
         """
-        self.caption = self.caption.decode('utf-8')
         # Draw background
         background = pygame.Surface((self.width, self.height))
         background.set_alpha(self.background_alpha)
