@@ -41,20 +41,21 @@ class ScreenPlaying(Screen):
     def __init__(self, screen_surface):
         Screen.__init__(self, screen_surface)
         # Player specific buttons
-        self.add_component(ButtonIcon('btn_prev', self.surface, ICO_PREVIOUS, SCREEN_WIDTH - 51, 85))
-        self.add_component(ButtonIcon('btn_next', self.surface, ICO_NEXT, SCREEN_WIDTH - 51, 125))
-        self.add_component(ButtonIcon('btn_volume', self.surface, ICO_VOLUME, SCREEN_WIDTH - 51, 165))
+        self.add_component(ButtonIcon('btn_menu', self.surface, ICO_MENU, SCREEN_WIDTH - 83, SCREEN_HEIGHT - 237))
+        self.add_component(ButtonIcon('btn_prev', self.surface, ICO_PREVIOUS, SCREEN_WIDTH - 83, SCREEN_HEIGHT - 178))
+        self.add_component(ButtonIcon('btn_next', self.surface, ICO_NEXT, SCREEN_WIDTH - 83, SCREEN_HEIGHT - 119))
+        self.add_component(ButtonIcon('btn_volume', self.surface, ICO_VOLUME, SCREEN_WIDTH - 83, SCREEN_HEIGHT - 60))
         # Cover art
         # self.add_component(Picture('pic_cover_art', self.surface, 0, 1, 240, 240, mpd.get_cover_art()))
         self.draw_cover_art()
         # Player specific labels
-        self.add_component(LabelText('lbl_track_artist', self.surface, 54, 3, SCREEN_WIDTH - 110, 18))
-        self.components['lbl_track_artist'].set_alignment(HOR_MID, VERT_MID)
-        self.add_component(LabelText('lbl_track_album', self.surface, 54, 19, SCREEN_WIDTH - 110, 18))
-        self.components['lbl_track_album'].set_alignment(HOR_MID, VERT_MID)
-        self.add_component(LabelText('lbl_track_title', self.surface, 55, SCREEN_HEIGHT - 27, SCREEN_WIDTH - 108, 18))
-        self.components['lbl_track_title'].set_alignment(HOR_MID, VERT_MID)
-        self.add_component(Slider2('slide_time', self.surface, 55, SCREEN_HEIGHT - 35, SCREEN_WIDTH - 108, 3))
+        self.add_component(LabelText('lbl_track_artist', self.surface, 0, 0, SCREEN_WIDTH - 85, 18))
+        self.components['lbl_track_artist'].set_alignment(HOR_LEFT, VERT_MID)
+        self.components['lbl_track_artist'].background_alpha_set(160)
+        self.add_component(LabelText('lbl_track_title', self.surface, 0, 18, SCREEN_WIDTH - 85, 18))
+        self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_MID)
+        self.components['lbl_track_title'].background_alpha_set(160)
+        self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 5, SCREEN_WIDTH - 85, 3))
 
     def show(self):
         """ Displays the screen. """
@@ -65,10 +66,9 @@ class ScreenPlaying(Screen):
         #    self.components['btn_play'].set_image_file(ICO_PAUSE)
         #else:
         #    self.components['btn_play'].set_image_file(ICO_PLAY)
-        #self.components['btn_play'].draw()
-        #self.components['lbl_track_title'].text_set(mpd.now_playing.title)
-        #self.components['lbl_track_artist'].text_set(mpd.now_playing.artist)
-        #self.components['lbl_track_album'].text_set(mpd.now_playing.album)
+        self.components['lbl_track_title'].text_set(mpd.now_playing.title)
+        self.components['lbl_track_artist'].text_set(mpd.now_playing.artist)
+
         #if mpd.radio_mode_get():
         #    self.components['lbl_track_artist'].visible = False
         #    self.components['lbl_track_album'].position_set(54, 3, SCREEN_WIDTH - 105, 39)
@@ -76,7 +76,6 @@ class ScreenPlaying(Screen):
         #else:
         self.components['lbl_track_artist'].visible = True
         self.components['lbl_track_artist'].text_set(mpd.now_playing.artist)
-        self.components['lbl_track_album'].position_set(54, 19, SCREEN_WIDTH - 105, 18)
         self.components['pic_cover_art'].picture_set(mpd.now_playing.cover_art_get())
         return super(ScreenPlaying, self).show()  # Draw screen
 
@@ -84,29 +83,25 @@ class ScreenPlaying(Screen):
         while True:
             try:
                 event = mpd.events.popleft()
-                self.components['screen_nav'].radio_mode_set(mpd.radio_mode_get())
+                # self.components['screen_nav'].radio_mode_set(mpd.radio_mode_get())
                 playing = mpd.now_playing
                 if event == 'time_elapsed':
-                    self.components['lbl_time_current'].text_set(playing.time_current)
+                    test = playing.time_percentage
                     self.components['slide_time'].draw(playing.time_percentage)
                 elif event == 'playing_file':
                     self.components['lbl_track_title'].text_set(playing.title)
                     if mpd.radio_mode_get():
                         self.components['lbl_track_artist'].visible = False
-                        self.components['lbl_track_album'].position_set(54, 3, SCREEN_WIDTH - 105, 39)
                         self.components['pic_cover_art'].picture_set(COVER_ART_RADIO)
                     else:
                         self.components['lbl_track_artist'].visible = True
                         self.components['lbl_track_artist'].text_set(playing.artist)
-                        self.components['lbl_track_album'].position_set(54, 19, SCREEN_WIDTH - 105, 18)
                         self.components['pic_cover_art'].picture_set(mpd.now_playing.cover_art_get())
-                    self.components['lbl_track_album'].text_set(playing.album)
-                    self.components['lbl_time_total'].text_set(playing.time_total)
-                elif event == 'state':
-                    if self.components['btn_play'].image_file != ICO_PAUSE and mpd.player_control_get() == 'play':
-                        self.components['btn_play'].draw(ICO_PAUSE)
-                    elif self.components['btn_play'].image_file == ICO_PAUSE and mpd.player_control_get() != 'play':
-                        self.components['btn_play'].draw(ICO_PLAY)
+                # elif event == 'state':
+                #     if self.components['btn_play'].image_file != ICO_PAUSE and mpd.player_control_get() == 'play':
+                #         self.components['btn_play'].draw(ICO_PAUSE)
+                #     elif self.components['btn_play'].image_file == ICO_PAUSE and mpd.player_control_get() != 'play':
+                #         self.components['btn_play'].draw(ICO_PLAY)
             except IndexError:
                 break
 
@@ -153,17 +148,14 @@ class ScreenPlaying(Screen):
 
     def draw_cover_art(self):
         left_position = 0
-        hor_length = SCREEN_WIDTH - 2 * 79
-        top_position = 40
-        vert_length = SCREEN_HEIGHT - 2 * 40
+        hor_length = SCREEN_WIDTH - 80 # - 2 * 79
+        top_position = 0
+        vert_length = SCREEN_HEIGHT - 5 # - 2 * 40
         if hor_length > vert_length:
             cover_size = vert_length
-            top_position = 40
-            left_position = 0 # (SCREEN_WIDTH - cover_size) / 2
         else:
             cover_size = hor_length
-            top_position = (SCREEN_HEIGHT - cover_size) / 2
-            left_position = 0
+            # top_position = (SCREEN_HEIGHT - cover_size) / 2
 
         self.add_component(Picture('pic_cover_art', self.surface, left_position, top_position, cover_size, cover_size,
                                    mpd.get_cover_art()))

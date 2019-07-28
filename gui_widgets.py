@@ -275,6 +275,10 @@ class LabelText(Widget):
         else:
             self.background_alpha = 255
 
+    def (self, value):
+        if -1 < value < 256:
+            self.background_alpha = value
+
     def set_alignment(self, horizontal, vertical, hor_indent=0, vert_indent=0):
         """ Sets the label's horizontal and vertical alignment within the defined
             rectangle and/or the text horizontal/vertical indent.
