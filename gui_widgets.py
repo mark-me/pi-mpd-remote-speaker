@@ -231,7 +231,7 @@ class Picture(Widget):
         #if img.size != (self.width, self.height):
         #    img_scaled = img.resize((self.width, self.height), Image.ANTIALIAS)
         #    img_scaled.save(self.__image_file)
-        self.__image = pygame.image.load(self.__image_file).convert()
+        self.__image = pygame.image.load(self.__image_file).convert_alpha()
         self.__image = pygame.transform.scale(self.__image, (self.width, self.height))
         SCREEN.blit(self.__image, (self.x_pos, self.y_pos))
         pygame.display.update(self.rect)
@@ -275,7 +275,7 @@ class LabelText(Widget):
         else:
             self.background_alpha = 255
 
-    def (self, value):
+    def background_alpha_set(self, value):
         if -1 < value < 256:
             self.background_alpha = value
 

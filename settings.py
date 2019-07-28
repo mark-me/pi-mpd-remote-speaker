@@ -118,6 +118,7 @@ ICO_SETTINGS_ACTIVE = RESOURCES + 'settings_active_48x32.png'
 ICO_BACK = RESOURCES + 'back_48x32.png'
 
 # Player icons
+PIC_PLAY = RESOURCES + 'play.png'
 ICO_MENU = RESOURCES + 'menu_80x50.png'
 ICO_PLAY = RESOURCES + 'play_48x32.png'
 ICO_PAUSE = RESOURCES + 'pause_48x32.png'
