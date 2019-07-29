@@ -33,10 +33,10 @@ import time
 RUN_ON_RASPBERRY_PI = os.uname()[4][:3] == 'arm'
 
 # Setting up touch screen, set if statement to true on Raspberry Pi
-if RUN_ON_RASPBERRY_PI:
-    os.environ['SDL_FBDEV'] = '/dev/fb1'
-    os.environ['SDL_MOUSEDEV'] = '/dev/input/touchscreen'
-    os.environ['SDL_MOUSEDRV'] = 'TSLIB'
+# if RUN_ON_RASPBERRY_PI:
+#     os.environ['SDL_FBDEV'] = '/dev/fb1'
+#     os.environ['SDL_MOUSEDEV'] = '/dev/input/touchscreen'
+#     os.environ['SDL_MOUSEDRV'] = 'TSLIB'
 
 # Display settings
 pygame.init() 	# Pygame initialization
