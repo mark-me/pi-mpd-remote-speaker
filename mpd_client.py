@@ -213,7 +213,7 @@ class MPDController(object):
         now_playing = MPDNowPlaying()
         try:
             now_playing.now_playing_set(self.mpd_client.currentsong())  # Get currently plating info
-        except mpd.ConnectionError:
+        except ConnectionError:
             self.mpd_client.connect(self.host, self.port)
             now_playing.now_playing_set(self.mpd_client.currentsong())
         if self.player_control_get() == 'play':
