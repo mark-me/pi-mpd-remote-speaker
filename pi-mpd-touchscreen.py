@@ -19,7 +19,7 @@
 **pi-mpd-touchscreen.py**: Main file
 """
 __author__ = 'Mark Zwart'
-import sys, pygame
+import sys
 from time import sleep
 from pygame import *
 from gui_screens import *
@@ -61,7 +61,7 @@ class PiJukeboxScreens(ScreenControl):
 
 
 # def apply_settings():
-#     # Check for first time settings
+#    # Check for first time settings
 #     if not config_file.setting_exists('MPD Settings', 'music directory'):
 #         screen_message = ScreenMessage(SCREEN, 'No music directory',
 #                                        "If you want to display cover art, Pi-Jukebox needs to know which directory your music collection is in. The location can also be found in your mpd.conf entry 'music directory'.",
@@ -79,7 +79,7 @@ class PiJukeboxScreens(ScreenControl):
 
 def main():
     """ The function where it all starts...."""
-    pygame.display.set_caption("Pi Jukebox")
+    pygame.display.set_caption("Sattelite speaker")
     # apply_settings()  # Check for first time settings and applies settings
 
     # Check whether mpd is running and get it's status
@@ -87,13 +87,13 @@ def main():
         print("Couldn't connect to the mpd server " + mpd.host + " on port " + str(
             mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
         sys.exit()
-    mpd.status_get()  # Get mpd status
-    screens = PiJukeboxScreens()  # Screens
-    screens.show()  # Display the screen
+    # mpd.status_get()  # Get mpd status
+#    screens = PiJukeboxScreens()  # Screens
+#    screens.show()  # Display the screen
 
-    pygame.init()
-    sleep(0.2)
-    pygame.display.update()
+#    pygame.init()
+#    sleep(0.2)
+#    pygame.display.update()
 
 
 if __name__ == '__main__':
