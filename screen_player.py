@@ -103,6 +103,7 @@ class ScreenPlaying(Screen):
 
     def on_click(self, x, y):
         tag_name = super(ScreenPlaying, self).on_click(x, y)
+        plyr_status = mpd.player_control_get()
         if tag_name == 'pic_cover_art':
             if mpd.player_control_get() == 'play':
                 mpd.player_control_set('pause')
@@ -118,6 +119,8 @@ class ScreenPlaying(Screen):
             screen_volume = ScreenVolume(self)
             screen_volume.show()
             self.show()
+        plyr_status = mpd.player_control_get()
+        return 0
 
     def draw_cover_art(self):
         left_position = 0
