@@ -19,17 +19,11 @@
 **pi-mpd-touchscreen.py**: Main file
 """
 __author__ = 'Mark Zwart'
-import sys, pygame
+
 from time import sleep
-from pygame import *
-from gui_screens import *
 # from config_file import *
 # from settings import *
-from mpd_client import *
 from screen_player import *
-# from screen_library import *
-# from screen_directory import *
-# from screen_radio import *
 # from screen_settings import *
 
 
@@ -42,26 +36,22 @@ class PiJukeboxScreens(ScreenControl):
     """
     def __init__(self):
         ScreenControl.__init__(self)
-
         self.add_screen(ScreenPlaying(SCREEN), self.loop_hook)  # Screen with now playing and cover art
-        #self.add_screen(ScreenPlaylist(SCREEN), self.loop_hook)  # Create player with playlist screen
-        #self.add_screen(ScreenLibrary(SCREEN), self.loop_hook)  # Create library browsing screen
-        #self.add_screen(ScreenDirectory(SCREEN), self.loop_hook)  # Create directory browsing screen
-        #self.add_screen(ScreenRadio(SCREEN), self.loop_hook)  # Create radio station managing screen
 
     def mpd_updates(self):
         """ Updates a current screen if it shows mpd relevant content. """
         self.screen_list[self.current_index].update()
 
     def loop_hook(self):
-        return mpd.status_get()
+        mpd_status = mpd.status_get()
+        return mpd_status
 
     def update(self):
         pass
 
 
 # def apply_settings():
-#     # Check for first time settings
+#    # Check for first time settings
 #     if not config_file.setting_exists('MPD Settings', 'music directory'):
 #         screen_message = ScreenMessage(SCREEN, 'No music directory',
 #                                        "If you want to display cover art, Pi-Jukebox needs to know which directory your music collection is in. The location can also be found in your mpd.conf entry 'music directory'.",
@@ -79,10 +69,7 @@ class PiJukeboxScreens(ScreenControl):
 
 def main():
     """ The function where it all starts...."""
-    if "SSH_CONNECTION" in os.environ:
-        print("Not starting pi-mpd-touchscreen, ssh session")
-        
-    pygame.display.set_caption("Pi Jukebox")
+    pygame.display.set_caption("Spooky speaker")
     # apply_settings()  # Check for first time settings and applies settings
 
     # Check whether mpd is running and get it's status

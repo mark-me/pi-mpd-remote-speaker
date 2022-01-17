@@ -20,13 +20,6 @@
 =======================================================
 """
 
-import sys, pygame
-from pygame.locals import *
-import time
-import subprocess
-import os
-import glob
-from gui_widgets import *
 from gui_screens import *
 from mpd_client import *
 from settings import *
