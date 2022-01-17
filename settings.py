@@ -45,7 +45,7 @@ DISPLAY_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 320, 240  # 320, 240 #800, 480
 PYGAME_EVENT_DELAY = 25
 
 if RUN_ON_RASPBERRY_PI:  # If started on Raspberry Pi
-    display_flags = FULLSCREEN | DOUBLEBUF | ANYFORMAT  # Turn on video acceleration
+    display_flags = FULLSCREEN | OPENGL  # Turn on video acceleration
     #: Points to the display.
     SCREEN = pygame.display.set_mode(DISPLAY_SIZE, display_flags)
     pygame.mouse.set_visible(False)                                 # Hide mouse cursor
