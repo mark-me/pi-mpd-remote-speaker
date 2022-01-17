@@ -45,13 +45,10 @@ DISPLAY_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 320, 240
 PYGAME_EVENT_DELAY = 25
 
 if RUN_ON_RASPBERRY_PI:  # If started on Raspberry Pi
-    pygame.init()
-    print(pygame.display.Info())
     display_flags = pygame.OPENGL | pygame.FULLSCREEN  # Turn on video acceleration
     SCREEN = pygame.display.set_mode(DISPLAY_SIZE, display_flags)
     pygame.mouse.set_visible(False)                                 # Hide mouse cursor
 else:
-    print(pygame.display.Info())
     SCREEN = pygame.display.set_mode(DISPLAY_SIZE)
 
 #: The directory where resources like button icons or the font file is stored.
