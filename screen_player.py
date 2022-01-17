@@ -37,6 +37,7 @@ class ScreenPlaying(Screen):
 
         :param screen_rect: The display's rectangle where the screen is drawn on.
     """
+
     def __init__(self, screen_surface):
         Screen.__init__(self, screen_surface)
         # Cover art
@@ -94,7 +95,7 @@ class ScreenPlaying(Screen):
         left_position = 40
         hor_length = SCREEN_WIDTH - 40
         top_position = 0
-        vert_length = SCREEN_HEIGHT # - 5
+        vert_length = SCREEN_HEIGHT  # - 5
         if hor_length > vert_length:
             cover_size = vert_length
         else:
