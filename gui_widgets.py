@@ -228,7 +228,7 @@ class Picture(Widget):
 
     def draw(self):
         # img = Image.open(self.__image_file)
-        #if img.size != (self.width, self.height):
+        # if img.size != (self.width, self.height):
         #    img_scaled = img.resize((self.width, self.height), Image.ANTIALIAS)
         #    img_scaled.save(self.__image_file)
         self.__image = pygame.image.load(self.__image_file).convert_alpha()
