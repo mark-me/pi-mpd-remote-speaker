@@ -47,7 +47,7 @@ PYGAME_EVENT_DELAY = 25
 if RUN_ON_RASPBERRY_PI:  # If started on Raspberry Pi
     display_flags = pygame.OPENGL | pygame.FULLSCREEN  # Turn on video acceleration
     #: Points to the display.
-    SCREEN = pygame.display.set_mode(DISPLAY_SIZE)
+    SCREEN = pygame.display.set_mode(DISPLAY_SIZE, display_flags)
     pygame.mouse.set_visible(False)                                 # Hide mouse cursor
 else:
     SCREEN = pygame.display.set_mode(DISPLAY_SIZE)
