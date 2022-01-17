@@ -19,13 +19,10 @@
 **mpd_client.py**: controlling and monitoring mpd via python-mpd2.
 ==================================================================
 """
-
-import sys, pygame
+import pygame
 import os
 import mpd
-import subprocess
 from collections import deque
-from mutagen import File
 
 MPD_TYPE_ARTIST = 'artist'
 MPD_TYPE_ALBUM = 'album'
@@ -34,6 +31,7 @@ MPD_TYPE_SONGS = 'title'
 DEFAULT_COVER = 'default_cover_art.png'
 TEMP_PLAYLIST_NAME = '_pi-jukebox_temp'
 
+
 # reload(sys)
 # sys.setdefaultencoding('utf8')
 
@@ -41,7 +39,8 @@ TEMP_PLAYLIST_NAME = '_pi-jukebox_temp'
 class MPDNowPlaying(object):
     """ Song information
     """
-    def __init__(self, mpd_client=None):
+
+    def __init__(self, mpd_client):
         self.__mpd_client = mpd_client
         self.playing_type = ''
         self.__now_playing = None
@@ -54,7 +53,7 @@ class MPDNowPlaying(object):
         self.time_current = ""  # Currently playing song time (string format)
         self.__time_total_sec = 0  # Currently playing song duration (seconds)
         self.time_total = ""  # Currently playing song duration (string format)
-        self.time_percentage = 0    # Currently playing song time as a percentage of the song duration
+        self.time_percentage = 0  # Currently playing song time as a percentage of the song duration
         self.music_directory = ""
 
     def now_playing_set(self, now_playing=None):
@@ -73,6 +72,7 @@ class MPDNowPlaying(object):
             else:
                 self.title = os.path.splitext(os.path.basename(now_playing['file']))[0]
             if self.playing_type == 'file':
+                self.art = self.get_cover_binary(self.file)
                 if 'artist' in now_playing:
                     self.artist = now_playing['artist']  # Artist of current song
                 else:
@@ -99,6 +99,20 @@ class MPDNowPlaying(object):
             self.time_percentage = 0
             self.__time_total_sec = 0
             self.time_total = self.make_time_string(0)  # Total time current
+        return True
+
+    def get_cover_binary(self, uri):
+        try:
+            binary = self.__mpd_client.albumart(uri)["binary"]
+        except:
+            try:
+                binary = self.__mpd_client.readpicture(uri)["binary"]
+            except:
+                binary = None
+        return binary
+
+    def get_cover_art(self):
+        return self.get_cover_binary(self.file)
 
     def current_time_set(self, seconds):
         if self.__time_current_sec != seconds:  # Playing time current
@@ -111,25 +125,6 @@ class MPDNowPlaying(object):
             return True
         else:
             return False
-
-    def cover_art_get(self, dest_file_name="covert_art.jpg"):
-        if self.file == "" or self.playing_type == 'radio':
-            return DEFAULT_COVER
-        try:
-            music_file = File(self.music_directory + "/" + self.file)
-        except IOError:
-            return DEFAULT_COVER
-        cover_art = None
-        if 'covr' in music_file:
-            cover_art = music_file.tags['covr'].data
-        elif 'APIC:' in music_file:
-            cover_art = music_file.tags['APIC:'].data
-        else:
-            return DEFAULT_COVER
-
-        with open(dest_file_name, 'wb') as img:
-            img.write(cover_art)  # write artwork to new image
-        return dest_file_name
 
     def make_time_string(self, seconds):
         minutes = int(seconds / 60)
@@ -160,67 +155,33 @@ class MPDController(object):
         self.port = 6600
         self.update_interval = 1000  # Interval between mpc status update calls (milliseconds)
         self.volume = 0  # Playback volume
-        self.playlist_current = []  # Current playlist song title
-        self.__radio_mode = False
-        self.now_playing = MPDNowPlaying()
+        self.now_playing = MPDNowPlaying(self.mpd_client)  # Dictionary containing currently playing song info
         self.events = deque([])  # Queue of mpd events
 
-        self.__now_playing = None  # Dictionary containing currently playing song info
-        self.__now_playing_changed = False
+        self.__now_playing_changed = True
         self.__player_control = ''  # Indicates whether mpd is playing, pausing or has stopped playing music
         self.__muted = False  # Indicates whether muted
-        self.__last_update_time = 0   # For checking last update time (milliseconds)
+        self.__last_update_time = 0  # For checking last update time (milliseconds)
         self.__status = None  # mpc's current status output
 
     def connect(self):
         """ Connects to mpd server.
-
             :return: Boolean indicating if successfully connected to mpd server.
         """
         try:
             self.mpd_client.connect(self.host, self.port)
-            self.__music_directory = self.mpd_client.listmounts()
         except Exception:
             return False
 
-        now_playing = MPDNowPlaying()
-        now_playing.now_playing_set(self.mpd_client.currentsong())
-        #self.__starts_with_radio()
-        #lst_mounts = self.mpd_client.listmounts()
-        #self.__music_directory = subprocess.check_output(['mpc', 'mount']).strip()
+        self.now_playing.now_playing_set(self.mpd_client.currentsong())
 
         # See if currently playing is radio station
         return True
-
-    def __starts_with_radio(self):
-        was_playing = False  # Indicates whether mpd was playing on start
-        now_playing = MPDNowPlaying()
-        try:
-            now_playing.now_playing_set(self.mpd_client.currentsong())  # Get currently playing info
-        except mpd.ConnectionError:
-            self.mpd_client.connect(self.host, self.port)
-            now_playing.now_playing_set(self.mpd_client.currentsong())
-        if self.player_control_get() == 'play':
-            was_playing = True
-        if now_playing.playing_type == 'radio':
-            station_url = now_playing.file  # If now playing is radio station temporarily store
-            try:
-                self.__radio_mode = False
-            except Exception:
-                pass
-            self.__radio_mode = True  # Turn on radio mode
-            self.mpd_client.addid(station_url)  # Reload station
-            if was_playing:
-                self.mpd_client.play(0)  # Resume playing
 
     def disconnect(self):
         """ Closes the connection to the mpd server. """
         self.mpd_client.close()
         self.mpd_client.disconnect()
-
-    def music_directory_set(self, path):
-        self.now_playing.music_directory = path
-        self.__music_directory = path
 
     def __parse_mpc_status(self):
         """ Parses the mpd status and fills mpd event queue
@@ -230,20 +191,16 @@ class MPDController(object):
         current_seconds = 0
         current_total = 0
         try:
-            now_playing = self.mpd_client.currentsong()
+            now_playing_new = self.mpd_client.currentsong()
         except Exception:
             return False
 
-        if self.__now_playing != now_playing and len(now_playing) > 0:  # Changed to a new song
-            self.now_playing.now_playing_set(now_playing)
-            if self.now_playing.playing_type == 'radio':
-                self.__radio_mode = True
-            else:
-                self.__radio_mode = False
+        if self.now_playing != now_playing_new and len(now_playing_new) > 0:  # Changed to a new song
             self.__now_playing_changed = True
-            if self.__now_playing is None or self.__now_playing.track_file != now_playing.track_file:
+            if self.now_playing is None or self.now_playing.file != now_playing_new['file']:
                 self.events.append('playing_file')
-            self.events.append('playing_time_percentage')
+            self.now_playing.now_playing_set(now_playing_new)
+            self.__radio_mode = self.now_playing.playing_type == 'radio'
 
         try:
             status = self.mpd_client.status()
@@ -257,17 +214,8 @@ class MPDController(object):
             self.events.append('player_control')
 
         if self.__player_control != 'stop':
-            if self.__playlist_current_playing_index != int(status['song']):  # Current playlist index
-                self.__playlist_current_playing_index = int(status['song'])
-                self.events.append('playing_index')
             if self.now_playing.current_time_set(self.str_to_float(status['elapsed'])):
                 self.events.append('time_elapsed')
-        else:
-            if self.__playlist_current_playing_index != -1:
-                self.__playlist_current_playing_index = -1
-                self.events.append('playing_index')
-                if self.now_playing.current_time_set(0):
-                    self.events.append('time_elapsed')
 
         return True
 
@@ -285,10 +233,10 @@ class MPDController(object):
         """
         self.mpd_client.ping()
         time_elapsed = pygame.time.get_ticks() - self.__last_update_time
-        if pygame.time.get_ticks() > self.update_interval and time_elapsed < self.update_interval:
+        if pygame.time.get_ticks() > self.update_interval > time_elapsed:
             return False
-        self.__last_update_time = pygame.time.get_ticks() # Reset update
-        return self.__parse_mpc_status()   # Parse mpc status output
+        self.__last_update_time = pygame.time.get_ticks()  # Reset update
+        return self.__parse_mpc_status()  # Parse mpc status output
 
     def current_song_changed(self):
         if self.__now_playing_changed:
@@ -296,9 +244,6 @@ class MPDController(object):
             return True
         else:
             return False
-
-    def get_cover_art(self, dest_file_name="covert_art.jpg"):
-        return self.now_playing.cover_art_get()
 
     def player_control_set(self, play_status):
         """ Controls playback
@@ -323,9 +268,6 @@ class MPDController(object):
         """ :return: Current playback mode. """
         self.status_get()
         return self.__player_control
-
-    def radio_mode_get(self):
-        return self.__radio_mode
 
 
 mpd = MPDController()
