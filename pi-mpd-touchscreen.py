@@ -79,6 +79,9 @@ class PiJukeboxScreens(ScreenControl):
 
 def main():
     """ The function where it all starts...."""
+    if "SSH_CONNECTION" in os.environ:
+        print("Not starting pi-mpd-touchscreen, ssh session")
+        
     pygame.display.set_caption("Pi Jukebox")
     # apply_settings()  # Check for first time settings and applies settings
 
