@@ -57,7 +57,6 @@ class ScreenPlaying(Screen):
         self.components['lbl_track_title'].text_set(mpd.now_playing.title)
         self.components['lbl_track_artist'].text_set(mpd.now_playing.artist)
         self.components['lbl_track_artist'].visible = True
-        self.components['lbl_track_artist'].text_set(mpd.now_playing.artist)
         return super(ScreenPlaying, self).show()  # Draw screen
 
     def update(self):
@@ -73,8 +72,8 @@ class ScreenPlaying(Screen):
                     with open('test.img', 'wb') as img:
                         img.write(img_cover)
                     self.components['pic_cover_art'].picture_set('test.img')
-                    self.components['lbl_track_title'].text_set(playing.title)
                     self.components['lbl_track_artist'].text_set(playing.artist)
+                    self.components['lbl_track_title'].text_set(playing.title)
             except IndexError:
                 break
 

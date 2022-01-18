@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/pi-mpd-touchscreen.iml" filepath="$PROJECT_DIR$/.idea/pi-mpd-touchscreen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/spooky-speaker.iml" filepath="$PROJECT_DIR$/.idea/spooky-speaker.iml" />
     </modules>
   </component>
 </project>
