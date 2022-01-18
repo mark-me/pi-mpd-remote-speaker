@@ -220,8 +220,8 @@ class Screen(object):
         self.blank_screen_time = self.timer() + BLANK_PERIOD
         while self.loop_active:
             # Blackout
-            if self.timer() > self.blank_screen_time:
-                self.blank_screen()
+            #if self.timer() > self.blank_screen_time:
+            #    self.blank_screen()
 
             pygame.time.wait(PYGAME_EVENT_DELAY)
             if self.loop_hook():  # and now <= deadline:
