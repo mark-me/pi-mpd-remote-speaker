@@ -202,7 +202,7 @@ class Screen(object):
             if value.visible:
                 value.draw()
         pygame.display.flip()
-        self.loop()
+        # self.loop()
         return self.return_object
 
     def update(self):
