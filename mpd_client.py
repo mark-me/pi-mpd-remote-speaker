@@ -19,6 +19,8 @@
 **mpd_client.py**: controlling and monitoring mpd via python-mpd2.
 ==================================================================
 """
+import logging
+
 import pygame
 import os
 import mpd
@@ -106,13 +108,23 @@ class MPDNowPlaying(object):
             binary = self.__mpd_client.albumart(uri)["binary"]
         except:
             try:
+                logging.warning("Could not retrieve album cover using albumart() of %s", uri)
                 binary = self.__mpd_client.readpicture(uri)["binary"]
             except:
+                logging.error("Could not retrieve album cover of %s", uri)
                 binary = None
         return binary
 
     def get_cover_art(self):
-        return self.get_cover_binary(self.file)
+
+        blob_cover = self.get_cover_binary(self.file)
+        if blob_cover == None:
+            file_cover_art = "default_cover_art.png"
+        else:
+            with open('covert_art.img', 'wb') as img:
+                img.write(blob_cover)  # write artwork to new image
+            file_cover_art = "covert_art.img"
+        return file_cover_art
 
     def current_time_set(self, seconds):
         if self.__time_current_sec != seconds:  # Playing time current
@@ -171,6 +183,7 @@ class MPDController(object):
         try:
             self.mpd_client.connect(self.host, self.port)
         except Exception:
+            logging.error("Failed to connect to MPD server")
             return False
 
         self.now_playing.now_playing_set(self.mpd_client.currentsong())
@@ -180,6 +193,7 @@ class MPDController(object):
 
     def disconnect(self):
         """ Closes the connection to the mpd server. """
+        logging.info("Closing down MPD connection")
         self.mpd_client.close()
         self.mpd_client.disconnect()
 
@@ -190,9 +204,12 @@ class MPDController(object):
         """
         current_seconds = 0
         current_total = 0
+        logging.info("Trying to get mpd status")
+        self.mpd_client.ping()
         try:
             now_playing_new = self.mpd_client.currentsong()
         except Exception:
+            logging.error("Couldn't get mpd status")
             return False
 
         if self.now_playing != now_playing_new and len(now_playing_new) > 0:  # Changed to a new song
@@ -231,7 +248,6 @@ class MPDController(object):
 
             :return: Returns boolean whether updated or not.
         """
-        self.mpd_client.ping()
         time_elapsed = pygame.time.get_ticks() - self.__last_update_time
         if pygame.time.get_ticks() > self.update_interval > time_elapsed:
             return False
@@ -250,19 +266,23 @@ class MPDController(object):
 
             :param play_status: Playback action ['play', 'pause', 'stop', 'next', 'previous'].
         """
-        if play_status == 'play':
-            if self.__player_control == 'pause':
-                self.mpd_client.play()
-            else:
-                self.mpd_client.pause(0)
-        elif play_status == 'pause':
-            self.mpd_client.pause(1)
-        elif play_status == 'stop':
-            self.mpd_client.stop()
-        elif play_status == 'next':
-            self.mpd_client.next()
-        elif play_status == 'previous':
-            self.mpd_client.previous()
+        logging.info("MPD player control %s", play_status)
+        try:
+            if play_status == 'play':
+                if self.__player_control == 'pause':
+                    self.mpd_client.play()
+                else:
+                    self.mpd_client.pause(0)
+            elif play_status == 'pause':
+                self.mpd_client.pause(1)
+            elif play_status == 'stop':
+                self.mpd_client.stop()
+            elif play_status == 'next':
+                self.mpd_client.next()
+            elif play_status == 'previous':
+                self.mpd_client.previous()
+        except:
+            logging.error("Could not send %s command to MPD", play_status)
 
     def player_control_get(self):
         """ :return: Current playback mode. """

@@ -20,6 +20,7 @@
 """
 __author__ = 'Mark Zwart'
 import sys, pygame
+import logging
 from time import sleep
 from pygame import *
 from gui_screens import *
@@ -27,6 +28,7 @@ from gui_screens import *
 # from settings import *
 from mpd_client import *
 from screen_player import *
+from mpd_client import *
 # from screen_library import *
 # from screen_directory import *
 # from screen_radio import *
@@ -79,6 +81,9 @@ class PiJukeboxScreens(ScreenControl):
 
 def main():
     """ The function where it all starts...."""
+    logging.basicConfig(filename='pi-mpd-touchscreen.log',
+                        format='%(asctime)s:%(levelname)s:%(message)s',
+                        level=logging.WARNING)
     if "SSH_CONNECTION" in os.environ:
         print("Not starting pi-mpd-touchscreen, ssh session")
         
@@ -90,6 +95,7 @@ def main():
         print("Couldn't connect to the mpd server " + mpd.host + " on port " + str(
             mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
         sys.exit()
+
     mpd.status_get()  # Get mpd status
     screens = PiJukeboxScreens()  # Screens
     screens.show()  # Display the screen

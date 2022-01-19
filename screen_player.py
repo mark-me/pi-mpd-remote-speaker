@@ -68,10 +68,8 @@ class ScreenPlaying(Screen):
                 if event == 'time_elapsed':
                     self.components['slide_time'].draw(playing.time_percentage)
                 if event == 'playing_file':
-                    img_cover = mpd.now_playing.get_cover_art()
-                    with open('test.img', 'wb') as img:
-                        img.write(img_cover)
-                    self.components['pic_cover_art'].picture_set('test.img')
+                    file_img_cover = mpd.now_playing.get_cover_art()
+                    self.components['pic_cover_art'].picture_set(file_img_cover)
                     self.components['lbl_track_artist'].text_set(playing.artist)
                     self.components['lbl_track_title'].text_set(playing.title)
             except IndexError:
@@ -100,12 +98,11 @@ class ScreenPlaying(Screen):
         else:
             cover_size = hor_length
 
-        img_cover = mpd.now_playing.get_cover_art()
-        with open('covert_art.img', 'wb') as img:
-            img.write(img_cover)  # write artwork to new image
+        file_img_cover = mpd.now_playing.get_cover_art()
+
         self.add_component(Picture('pic_cover_art',
                                    self.surface, left_position, top_position, cover_size, cover_size,
-                                   'covert_art.img'))
+                                   file_img_cover))
 
 
 class ScreenVolume(ScreenModal):
