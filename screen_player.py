@@ -41,7 +41,10 @@ class ScreenPlaying(Screen):
     def __init__(self, screen_surface):
         Screen.__init__(self, screen_surface)
         # Cover art
-        self.draw_cover_art()
+        # self.draw_cover_art()
+        self.add_component(Picture('pic_cover_art',
+                                   self.surface, 40, 0, 240, 240,
+                                   "default_cover_art.png"))
         # Player specific labels
         self.add_component(LabelText('lbl_track_artist', self.surface, 0, 0, SCREEN_WIDTH, 18))
         self.components['lbl_track_artist'].set_alignment(HOR_LEFT, VERT_MID)
@@ -53,7 +56,7 @@ class ScreenPlaying(Screen):
 
     def show(self):
         """ Displays the screen. """
-        self.components['pic_cover_art'].picture_set('test.img')
+        self.components['pic_cover_art'].picture_set(mpd.now_playing.get_cover_art())
         self.components['lbl_track_title'].text_set(mpd.now_playing.title)
         self.components['lbl_track_artist'].text_set(mpd.now_playing.artist)
         self.components['lbl_track_artist'].visible = True
@@ -64,7 +67,7 @@ class ScreenPlaying(Screen):
             try:
                 event = mpd.events.popleft()
                 playing = mpd.now_playing
-                print(event)
+                logging.info("Update event: %s", event)
                 if event == 'time_elapsed':
                     self.components['slide_time'].draw(playing.time_percentage)
                 if event == 'playing_file':

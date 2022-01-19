@@ -50,7 +50,6 @@ class MPDNowPlaying(object):
         self.artist = ""  # Currently playing artist
         self.album = ""  # Album the currently playing song is on
         self.file = ""  # File with path relative to MPD music directory
-        self.art = None
         self.__time_current_sec = 0  # Currently playing song time (seconds)
         self.time_current = ""  # Currently playing song time (string format)
         self.__time_total_sec = 0  # Currently playing song duration (seconds)
@@ -74,7 +73,6 @@ class MPDNowPlaying(object):
             else:
                 self.title = os.path.splitext(os.path.basename(now_playing['file']))[0]
             if self.playing_type == 'file':
-                self.art = self.get_cover_binary(self.file)
                 if 'artist' in now_playing:
                     self.artist = now_playing['artist']  # Artist of current song
                 else:
@@ -105,11 +103,14 @@ class MPDNowPlaying(object):
 
     def get_cover_binary(self, uri):
         try:
+            logging.warning("Start first try to get cover art from %s", uri)
             binary = self.__mpd_client.albumart(uri)["binary"]
+            logging.warning("End first try to get cover art")
         except:
             try:
                 logging.warning("Could not retrieve album cover using albumart() of %s", uri)
                 binary = self.__mpd_client.readpicture(uri)["binary"]
+                logging.warning("After second try to get cover art")
             except:
                 logging.error("Could not retrieve album cover of %s", uri)
                 binary = None
@@ -118,7 +119,7 @@ class MPDNowPlaying(object):
     def get_cover_art(self):
 
         blob_cover = self.get_cover_binary(self.file)
-        if blob_cover == None:
+        if blob_cover is None:
             file_cover_art = "default_cover_art.png"
         else:
             with open('covert_art.img', 'wb') as img:
@@ -188,7 +189,6 @@ class MPDController(object):
 
         self.now_playing.now_playing_set(self.mpd_client.currentsong())
 
-        # See if currently playing is radio station
         return True
 
     def disconnect(self):
