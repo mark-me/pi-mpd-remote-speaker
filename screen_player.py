@@ -101,11 +101,11 @@ class ScreenPlaying(Screen):
             cover_size = hor_length
 
         img_cover = mpd.now_playing.get_cover_art()
-        with open('test.img', 'wb') as img:
+        with open('covert_art.img', 'wb') as img:
             img.write(img_cover)  # write artwork to new image
         self.add_component(Picture('pic_cover_art',
                                    self.surface, left_position, top_position, cover_size, cover_size,
-                                   'test.img'))
+                                   'covert_art.img'))
 
 
 class ScreenVolume(ScreenModal):
