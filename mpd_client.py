@@ -103,14 +103,14 @@ class MPDNowPlaying(object):
 
     def get_cover_binary(self, uri):
         try:
-            logging.warning("Start first try to get cover art from %s", uri)
+            logging.info("Start first try to get cover art from %s", uri)
             binary = self.__mpd_client.albumart(uri)["binary"]
-            logging.warning("End first try to get cover art")
+            logging.info("End first try to get cover art")
         except:
             try:
                 logging.warning("Could not retrieve album cover using albumart() of %s", uri)
                 binary = self.__mpd_client.readpicture(uri)["binary"]
-                logging.warning("After second try to get cover art")
+                logging.info("After second try to get cover art")
             except:
                 logging.error("Could not retrieve album cover of %s", uri)
                 binary = None
@@ -218,6 +218,8 @@ class MPDController(object):
                 self.events.append('playing_file')
             self.now_playing.now_playing_set(now_playing_new)
             self.__radio_mode = self.now_playing.playing_type == 'radio'
+            if self.now_playing.album == '' or self.now_playing.album != now_playing_new['album']:
+                self.events.append('album_change')
 
         try:
             status = self.mpd_client.status()
