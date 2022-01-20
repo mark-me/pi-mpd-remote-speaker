@@ -1,5 +1,5 @@
 #! /bin/bash
-source venvs/pi-mpd-touchscreen/bin/activate
-# virtualenv is now active.
-#
+
+cd pi-mpd-touchscreen
 python3 pi-mpd-touchscreen.py
+cd ..
