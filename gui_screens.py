@@ -22,10 +22,6 @@ __author__ = 'Mark Zwart'
 #
 # (C) 2015- by Mark Zwart, <mark.zwart@pobox.com>
 
-import sys, pygame
-from pygame.locals import *
-import time
-import math
 from gui_widgets import *
 from settings import *
 
@@ -54,7 +50,7 @@ BLANK_PERIOD = 300000
 
 
 class GestureDetector(object):
-    """ Class for detecint mouse gestures
+    """ Class for detecting mouse gestures
     """
     def __init__(self):
         self.gesture = GESTURE_NONE
@@ -69,7 +65,7 @@ class GestureDetector(object):
     def capture_gesture(self, event):
         """ Mouse event loop, runs from mouse down to mouse up event.
 
-            :param event: pygame event.
+            :param event: pygame event
         """
 
         if event.type != pygame.MOUSEBUTTONDOWN:
@@ -77,7 +73,6 @@ class GestureDetector(object):
 
         gesture_ended = False
 
-        mouse_down_time = pygame.time.get_ticks()  # Start timer to detect long mouse clicks
         self.x_start, self.y_start = pygame.mouse.get_pos()  # Get click position (= start position for swipe)
         pygame.mouse.get_rel()  # Start tracking mouse movement
         mouse_down_time = pygame.time.get_ticks()
@@ -137,9 +132,8 @@ class ScreenControl(object):
     """ Manages screens of type Screen.
         Handles screen switching, clicking and swiping and mpd status updating.
 
-        :ivar screen_list: List containing all screen objects.
-        :ivar current_index: Points to current screen in screen_list.
-        :ivar mouse_down_pos: Mouse position on mouse down.
+        :ivar screen_list: List containing all screen objects
+        :ivar current_index: Points to current screen in screen_list
     """
 
     def __init__(self):
@@ -163,7 +157,7 @@ class ScreenControl(object):
 class Screen(object):
     """ Basic screen used for displaying widgets. This type of screen should be used for the entire program.
 
-        :param screen_rect: The screen's rectangle where the screen is drawn on
+        :param screen_or_surface: The screen's rectangle where the screen is drawn on
 
         :ivar components: Dictionary holding the screen's widgets with a tag_name as key and the widget as value
         :ivar color: The screen's background color, default = :py:const:BLACK
@@ -188,7 +182,7 @@ class Screen(object):
     def add_component(self, widget):
         """ Adds components to component list, thus ensuring a component is found on a mouse event.
 
-            :param widget: The widget that should be added to the dictionary.
+            :param widget: The widget that should be added to the dictionary
         """
         self.components[widget.tag_name] = widget
 
@@ -203,7 +197,6 @@ class Screen(object):
                 value.draw()
         pygame.display.flip()
         self.loop()
-        return self.return_object
 
     def update(self):
         pass
@@ -237,7 +230,7 @@ class Screen(object):
         y = self.gesture_detect.y_start
 
         if gesture == GESTURE_CLICK:  # Fire click function
-            ret_value = self.on_click(x, y)  # Relay tap/click to active screen
+            return self.on_click(x, y)  # Relay tap/click to active screen
         # Relay vertical swiping to active screen controls
         elif gesture == GESTURE_SWIPE_UP or gesture == GESTURE_SWIPE_DOWN:
             x = self.gesture_detect.x_start
@@ -248,7 +241,7 @@ class Screen(object):
         pass
 
     def on_click(self, x, y):
-        """ Determines which component was clicked and fires it's click function in turn.
+        """ Determines which component was clicked and fires its click function in turn
 
             :param x: The horizontal click position.
             :param y: The vertical click position.
@@ -305,11 +298,10 @@ class Screen(object):
 
 class ScreenModal(Screen):
     """ Screen with its own event capture loop.
+        :param screen_or_surface: The display's rectangle where the screen is drawn on
+        :param title: The title displayed at the top of the screen
 
-        :param screen_rect: The display's rectangle where the screen is drawn on.
-        :param title: The title displayed at the top of the screen.
-
-        :ivar title: The title displayed at the top of the screen.
+        :ivar title: The title displayed at the top of the screen
     """
 
     def __init__(self, screen_or_surface, title):
@@ -362,9 +354,9 @@ class ScreenModal(Screen):
 class ScreenMessage(ScreenModal):
     """ A screen that displays a message.
 
-        :param screen_rect: The display's rectangle where the screen is drawn on.
-        :param caption: The title displayed at the top of the screen.
-        :param text: Text displayed in the screen.
+        :param screen_or_surface: The display's rectangle where the screen is drawn on
+        :param caption: The title displayed at the top of the screen
+        :param text: Text displayed in the screen
         :param message_type: Determines the lay-out of the screen [information, warning, error]
     """
 
@@ -402,9 +394,9 @@ class ScreenMessage(ScreenModal):
 class ScreenYesNo(ScreenModal):
     """ A screen that displays a message.
 
-        :param screen_rect: The display's rectangle where the screen is drawn on.
-        :param caption: The title displayed at the top of the screen.
-        :param text: Text displayed in the screen.
+        :param screen_or_surface: The display's rectangle where the screen is drawn on
+        :param caption: The title displayed at the top of the screen
+        :param text: Text displayed in the screen
     """
 
     def __init__(self, screen_or_surface, caption, text):

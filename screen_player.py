@@ -19,14 +19,6 @@
 **screen_player.py**: Playback screen.
 =======================================================
 """
-
-import sys, pygame
-from pygame.locals import *
-import time
-import subprocess
-import os
-import glob
-from gui_widgets import *
 from gui_screens import *
 from mpd_client import *
 from settings import *
@@ -34,8 +26,6 @@ from settings import *
 
 class ScreenPlaying(Screen):
     """ Screen cover art
-
-        :param screen_rect: The display's rectangle where the screen is drawn on.
     """
 
     def __init__(self, screen_surface):
@@ -81,7 +71,6 @@ class ScreenPlaying(Screen):
 
     def on_click(self, x, y):
         tag_name = super(ScreenPlaying, self).on_click(x, y)
-        plyr_status = mpd.player_control_get()
         if tag_name == 'pic_cover_art':
             if mpd.player_control_get() == 'play':
                 mpd.player_control_set('pause')
@@ -89,7 +78,6 @@ class ScreenPlaying(Screen):
             else:
                 mpd.player_control_set('play')
                 self.components['lbl_track_artist'].visible = False
-        plyr_status = mpd.player_control_get()
         return 0
 
     def draw_cover_art(self):
@@ -111,8 +99,6 @@ class ScreenPlaying(Screen):
 
 class ScreenVolume(ScreenModal):
     """ Screen setting volume
-
-        :param screen_rect: The display's rectangle where the screen is drawn on.
     """
 
     def __init__(self, screen):
