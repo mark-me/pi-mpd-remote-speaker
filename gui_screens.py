@@ -224,9 +224,9 @@ class Screen(object):
             if self.loop_hook():  # and now <= deadline:
                 self.update()
             for event in pygame.event.get():  # Do for all events in pygame's event queue
-                ret_value = self.process_mouse_event(event)  # Handle mouse related events
-                if event.type == KEYDOWN and event.key == K_ESCAPE:
-                    sys.exit()
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        pygame.quit()
 
     def process_mouse_event(self, event):
         """ Processes mouse events. """
