@@ -34,10 +34,6 @@ DEFAULT_COVER = 'default_cover_art.png'
 TEMP_PLAYLIST_NAME = '_pi-jukebox_temp'
 
 
-# reload(sys)
-# sys.setdefaultencoding('utf8')
-
-
 class MPDNowPlaying(object):
     """ Song information
     """
