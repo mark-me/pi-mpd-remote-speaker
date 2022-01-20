@@ -62,6 +62,7 @@ class MPDNowPlaying(object):
             try:
                 self.file = now_playing['file']
             except KeyError:
+                logging.error("Could not read filename of nowplaying")
                 return False
             if self.file[:7] == "http://":
                 self.playing_type = 'radio'
