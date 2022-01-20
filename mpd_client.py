@@ -209,21 +209,23 @@ class MPDController(object):
         try:
             now_playing_new = self.mpd_client.currentsong()
         except Exception:
-            logging.error("Couldn't get mpd status")
+            logging.error("Couldn't get mpd current song")
             return False
 
         if self.now_playing != now_playing_new and len(now_playing_new) > 0:  # Changed to a new song
             self.__now_playing_changed = True
             if self.now_playing is None or self.now_playing.file != now_playing_new['file']:
                 self.events.append('playing_file')
-            self.now_playing.now_playing_set(now_playing_new)
             self.__radio_mode = self.now_playing.playing_type == 'radio'
             if self.now_playing.album == '' or self.now_playing.album != now_playing_new['album']:
+                logging.warning("Album change event added")
                 self.events.append('album_change')
+            self.now_playing.now_playing_set(now_playing_new)
 
         try:
             status = self.mpd_client.status()
         except Exception:
+            logging.error("Couldn't get mpd status")
             return False
         if self.__status == status:
             return False
