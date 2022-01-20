@@ -227,12 +227,8 @@ class Picture(Widget):
         self.__image = pygame.transform.scale(self.__image, (self.width, self.height))
 
     def draw(self):
-        # img = Image.open(self.__image_file)
-        # if img.size != (self.width, self.height):
-        #    img_scaled = img.resize((self.width, self.height), Image.ANTIALIAS)
-        #    img_scaled.save(self.__image_file)
         self.__image = pygame.image.load(self.__image_file).convert_alpha()
-        self.__image = pygame.transform.scale(self.__image, (self.width, self.height))
+        self.__image = pygame.transform.smoothscale(self.__image, (self.width, self.height))
         SCREEN.blit(self.__image, (self.x_pos, self.y_pos))
         pygame.display.update(self.rect)
 
