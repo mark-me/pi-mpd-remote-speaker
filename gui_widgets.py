@@ -23,12 +23,9 @@
 
 __author__ = 'Mark Zwart'
 
-import sys, pygame
 from pygame.locals import *
-import time
 import math
 from settings import *
-# import Image
 
 # Alignment variables
 HOR_LEFT = 0
@@ -42,12 +39,12 @@ VERT_BOTTOM = 2
 class Widget(object):
     """ Widget is the base class of screen widgets and should not be instantiated by itself.
 
-        :param tag_name: Text identifying the widget.
-        :param screen_rect: The screen's rectangle where the widget is drawn on.
-        :param x: The horizontal starting position of the widget's rectangle.
-        :param y: The vertical starting position of the widget's rectangle.
-        :param width: The width of the widget's rectangle.
-        :param height: The height of the widget's rectangle.
+        :param tag_name: Text identifying the widget
+        :param surface: The screen's rectangle where the widget is drawn on
+        :param x: The horizontal starting position of the widget's rectangle
+        :param y: The vertical starting position of the widget's rectangle
+        :param width: The width of the widget's rectangle
+        :param height: The height of the widget's rectangle
     """
 
     def __init__(self, tag_name, surface, x, y, width, height):
@@ -85,12 +82,12 @@ class Widget(object):
 class Rectangle(Widget):
     """ Drawing a rectangle on screen
 
-        :param tag_name: Text identifying the rectangle.
-        :param screen_rect: The screen's rectangle where the rectangle is drawn on.
-        :param x: The horizontal starting position of the rectangle's rectangle.
-        :param y: The vertical starting position of the rectangle's rectangle.
-        :param width: The width of the rectangle's rectangle.
-        :param height: The height of the rectangle's rectangle.
+        :param tag_name: Text identifying the rectangle
+        :param surface: The screen's rectangle where the rectangle is drawn on
+        :param x: The horizontal starting position of the rectangle's rectangle
+        :param y: The vertical starting position of the rectangle's rectangle
+        :param width: The width of the rectangle's rectangle
+        :param height: The height of the rectangle's rectangle
     """
 
     def __init__(self, tag_name, surface, x, y, width, height):
@@ -106,12 +103,12 @@ class Rectangle(Widget):
 class Slider(Rectangle):
     """ A slider control
 
-        :param tag_name: Text identifying the slider.
-        :param screen_rect: The screen's rectangle where the slider is drawn on.
-        :param x: The horizontal starting position of the slider's rectangle.
-        :param y: The vertical starting position of the slider's rectangle.
-        :param width: The width of the slider's rectangle.
-        :param height: The height of the slider's rectangle.
+        :param tag_name: Text identifying the slider
+        :param surface: The screen's rectangle where the slider is drawn on
+        :param x: The horizontal starting position of the slider's rectangle
+        :param y: The vertical starting position of the slider's rectangle
+        :param width: The width of the slider's rectangle
+        :param height: The height of the slider's rectangle
     """
 
     def __init__(self, tag_name, surface, x, y, width, height):
@@ -158,12 +155,12 @@ class Slider(Rectangle):
 class Slider2(Widget):
     """ A slider control with a different lay-out.
 
-        :param tag_name: Text identifying the slider.
-        :param screen_rect: The screen's rectangle where the slider is drawn on.
-        :param x: The horizontal starting position of the slider's rectangle.
-        :param y: The vertical starting position of the slider's rectangle.
-        :param width: The width of the slider's rectangle.
-        :param height: The height of the slider's rectangle.
+        :param tag_name: Text identifying the slider
+        :param surface: The screen's rectangle where the slider is drawn on
+        :param x: The horizontal starting position of the slider's rectangle
+        :param y: The vertical starting position of the slider's rectangle
+        :param width: The width of the slider's rectangle
+        :param height: The height of the slider's rectangle
     """
 
     def __init__(self, tag_name, surface, x, y, width, height):
@@ -196,7 +193,7 @@ class Slider2(Widget):
         if percentage == 0:
             width = 1
         else:
-            width = (self.width) * (float(percentage) / 100)
+            width = self.width * (float(percentage) / 100)
         self.progress_rect = Rect(self.x_pos, self.y_pos, width, self.height)
         self.progress_percentage = percentage
         self.draw()
@@ -212,12 +209,12 @@ class Slider2(Widget):
 class Picture(Widget):
     """ Picture on screen
 
-        :param tag_name: Text identifying the picture.
-        :param screen_rect: The screen's rectangle where the picture is drawn on.
-        :param x: The horizontal starting position of the picture's rectangle.
-        :param y: The vertical starting position of the picture's rectangle.
-        :param width: The width of the picture's rectangle.
-        :param height: The height of the picture's rectangle.
+        :param tag_name: Text identifying the picture
+        :param surface: The screen's rectangle where the picture is drawn on
+        :param x: The horizontal starting position of the picture's rectangle
+        :param y: The vertical starting position of the picture's rectangle
+        :param width: The width of the picture's rectangle
+        :param height: The height of the picture's rectangle
     """
 
     def __init__(self, tag_name, surface, x, y, width, height, image_file=""):
@@ -244,12 +241,12 @@ class Picture(Widget):
 class LabelText(Widget):
     """ LabelText is used to write text that needs to fit in a pre-defined rectangle.
 
-        :param tag_name: Text identifying the label.
-        :param screen_rect: The screen's rectangle where the label is drawn on.
-        :param x: The horizontal starting position of the label's rectangle.
-        :param y: The vertical starting position of the label's rectangle.
-        :param width: The width of the label's rectangle.
-        :param height: The height of the label's rectangle.
+        :param tag_name: Text identifying the label
+        :param surface: The screen's rectangle where the label is drawn on
+        :param x: The horizontal starting position of the label's rectangle
+        :param y: The vertical starting position of the label's rectangle
+        :param width: The width of the label's rectangle
+        :param height: The height of the label's rectangle
         :param text: The text to be displayed in the label, default= ""
     """
 
@@ -279,7 +276,10 @@ class LabelText(Widget):
         """ Sets the label's horizontal and vertical alignment within the defined
             rectangle and/or the text horizontal/vertical indent.
 
-            :param horizontal: Horizontal alignment [
+            :param horizontal: Horizontal alignment
+            :param vertical: Vertical alignment
+            :param hor_indent: Horizontal indent
+            :param vert_indent: Vertical indent
         """
         self.alignment_horizontal = horizontal
         self.alignment_vertical = vertical
@@ -293,8 +293,6 @@ class LabelText(Widget):
 
     def draw(self):
         """ Draws the label.
-
-            :param text: default = "", set's the label's text,
 
             :return: Text that couldn't be fitted inside the label's rectangle,
         """
@@ -338,12 +336,12 @@ class LabelText(Widget):
 class Memo(Widget):
     """ LabelText is used to write text that needs to fit in a pre-defined rectangle.
 
-        :param tag_name: Text identifying the memo field.
-        :param screen_rect: The screen's rectangle where the memo field is drawn on.
-        :param x: The horizontal starting position of the memo field's rectangle.
-        :param y: The vertical starting position of the memo field's rectangle.
-        :param width: The width of the memo field's rectangle.
-        :param height: The height of the memo field's rectangle.
+        :param tag_name: Text identifying the memo field
+        :param surface: The screen's rectangle where the memo field is drawn on
+        :param x: The horizontal starting position of the memo field's rectangle
+        :param y: The vertical starting position of the memo field's rectangle
+        :param width: The width of the memo field's rectangle
+        :param height: The height of the memo field's rectangle
         :param text: The text to be displayed in the memo, default= ""
     """
 
@@ -383,7 +381,7 @@ class Memo(Widget):
 
     def transparent_set(self, value):
         """ Turns background transparent or opaque. """
-        if value == True:
+        if value:
             self.background_alpha = 0
         else:
             self.background_alpha = 255
@@ -394,7 +392,6 @@ class Memo(Widget):
         self.indent_horizontal = hor_indent
 
     def __truncate_line(self):
-        number_of_chars = len(self.__caption)
         split_text = self.__caption
         label_width = self.font.size(self.__caption)[0]
         cut = 0
@@ -409,7 +406,6 @@ class Memo(Widget):
             else:
                 split_text = n
             label_width = self.font.size(split_text)[0]
-            number_of_chars = len(split_text)
             done = False
         return done, split_text
 
@@ -426,13 +422,13 @@ class Memo(Widget):
 class ButtonIcon(Widget):
     """ ButtonIcon class is a button that only displays an icon.
 
-        :param tag_name: Text identifying the widget,
-        :param screen_rect: The screen's rectangle where the button should be drawn,
-        :param x: The horizontal position of the button,
-        :param y: The vertical position of the button,
+        :param tag_name: Text identifying the widget
+        :param surface: The screen's rectangle where the button should be drawn
+        :param x: The horizontal position of the button
+        :param y: The vertical position of the button
 
-        :ivar caption: The button's caption,
-        :ivar image_file: The button's icon image file name,
+        :ivar caption: The button's caption
+        :ivar image_file: The button's icon image file name
     """
 
     def __init__(self, tag_name, surface, image, x, y):
@@ -456,7 +452,7 @@ class ButtonIcon(Widget):
     def set_image_file(self, file_name):
         """ Sets the buttons icon.
 
-            :param file_name: Points to the icon's file name.
+            :param file_name: Points to the icon's file name
         """
         self.image_file = file_name
         self.__icon = pygame.image.load(self.image_file)
@@ -468,17 +464,17 @@ class ButtonIcon(Widget):
 class ButtonText(LabelText):
     """ ButtonText class is a button with text that uses two images for button rendering.
 
-        :param tag_name: Text identifying the widget,
-        :param screen_rect: The screen's rectangle where the button should be drawn,
-        :param x: The horizontal position of the button,
-        :param y: The vertical position of the button,
-        :param width: The label's rectangle width,
-        :param text: default "", The label's caption,
+        :param tag_name: Text identifying the widget
+        :param surface: The screen's rectangle where the button should be drawn
+        :param x: The horizontal position of the button
+        :param y: The vertical position of the button
+        :param width: The label's rectangle width
+        :param text: default "", The label's caption
 
-        :ivar transparent: Whether the label's background is transparent, default = False,
-        :ivar font_color: The text font color,
-        :ivar alignment_horizontal: The button's text horizontal alignment, default = :py:const:HOR_MID.
-        :ivar alignment_vertical: The button's text vertical alignment, default = :py:const:VERT_MID,
+        :ivar transparent: Whether the label's background is transparent, default = False
+        :ivar font_color: The text font color
+        :ivar alignment_horizontal: The button's text horizontal alignment, default = :py:const:HOR_MID
+        :ivar alignment_vertical: The button's text vertical alignment, default = :py:const:VERT_MID
     """
 
     def __init__(self, tag_name, surface, x, y, width, height, text=""):
@@ -498,17 +494,17 @@ class ButtonText(LabelText):
         self.surface.fill(self.button_color, self.button_rect)  # Background
         if text is not None:
             self.caption = text
-        super(ButtonText,self).draw()
+        super(ButtonText, self).draw()
         pygame.display.update(self.rect)
 
 
 class Switch(Widget):
     """ An on/off control for settings
 
-        :param tag_name: Text identifying the widget,
-        :param screen_rect: The screen's rectangle where the button should be drawn,
-        :param x: The horizontal position of the button,
-        :param y: The vertical position of the button,
+        :param tag_name: Text identifying the widget
+        :param surface: The screen's rectangle where the button should be drawn
+        :param x: The horizontal position of the button
+        :param y: The vertical position of the button
     """
 
     def __init__(self, tag_name, surface, x, y):
@@ -522,7 +518,7 @@ class Switch(Widget):
     def set_on(self, boolean):
         """ Turns the control status to on or off.
 
-            :param boolean: Boolean determining whether the control is in the 'on' state.
+            :param boolean: Boolean determining whether the control is in the 'on' state
         """
         self.__is_on = boolean
         self.draw()
@@ -551,28 +547,29 @@ class Switch(Widget):
 class ItemList(Widget):
     """ List of text items that can be clicked.
 
-        :param tag_name: Text identifying the list.
-        :param screen_rect: The screen's rectangle where the list is drawn on.
-        :param x: The horizontal starting position of the list's rectangle.
-        :param y: The vertical starting position of the list's rectangle.
-        :param width: The width of the list's rectangle.
-        :param height: The height of the list's rectangle.
+        :param tag_name: Text identifying the list
+        :param surface: The screen's rectangle where the list is drawn on
+        :param x: The horizontal starting position of the list's rectangle
+        :param y: The vertical starting position of the list's rectangle
+        :param width: The width of the list's rectangle
+        :param height: The height of the list's rectangle
 
-        :ivar list: List containing items for ItemList.
-        :ivar outline_visible: Indicates whether the outline of the list is visible, default = True.
+        :ivar list: List containing items for ItemList
+        :ivar outline_visible: Indicates whether the outline of the list is visible, default = True
 
-        :ivar item_height: The height of one list item, default = 25.
-        :ivar item_indent: The indent for the text of a list item, default = 2.
-        :ivar item_alignment_horizontal: Horizontal alignment of an item's text, default = :py:const:HOR_LEFT.
-        :ivar item_alignment_vertical: Vertical alignment of an item's text, default = :py:const:VERT_MID.
-        :ivar item_outline_visible: Boolean for displaying the rectangle of an item, default = False.
+        :ivar item_height: The height of one list item, default = 25
+        :ivar item_indent: The indent for the text of a list item, default = 2
+        :ivar item_alignment_horizontal: Horizontal alignment of an item's text, default = :py:const:HOR_LEFT
+        :ivar item_alignment_vertical: Vertical alignment of an item's text, default = :py:const:VERT_MID
+        :ivar item_outline_visible: Boolean for displaying the rectangle of an item, default = False
 
-        :ivar active_item_index: The index of the currently active list item. It differs from selected in that it is set by the program and not by the user, default = -1.
-        :ivar item_active_color: The active list item for color, default = :py:const:BLUE.
-        :ivar item_active_background_color: The active list item background color, default = :py:const:WHITE.
-        :ivar item_selected_index: The index of the selected list item, default = -1.
-        :ivar item_selected_color: The font color of a selected item, default = :py:const:BLUE.
-        :ivar item_selected_background_color: The selected list item background color, default = :py:const:WHITE.
+        :ivar active_item_index: The index of the currently active list item. It differs from selected in that it is
+        set by the program and not by the user, default = -1
+        :ivar item_active_color: The active list item for color, default = :py:const:BLUE
+        :ivar item_active_background_color: The active list item background color, default = :py:const:WHITE
+        :ivar item_selected_index: The index of the selected list item, default = -1
+        :ivar item_selected_color: The font color of a selected item, default = :py:const:BLUE
+        :ivar item_selected_background_color: The selected list item background color, default = :py:const:WHITE
     """
 
     def __init__(self, tag_name, surface, x, y, width, height):
@@ -614,18 +611,12 @@ class ItemList(Widget):
 
     def draw_page_indicator(self):
         """ Draws a 'progress' indicator on the list. """
-        no_pages = self.pages_count()
         if self.pages_count() > 1:
             indicator_width = 3
             indicator_height = self.height / self.pages_count()
             indicator_x = self.x_pos + self.width - indicator_width
             indicator_y = self.y_pos + self.page_showing_index * indicator_height
-            # indicator = pygame.Surface(indicator_width, indicator_height)
-            #indicator.set_alpha(128)
-            #indicator.fill(FIFTIES_ORANGE)
-            #SCREEN.blit(indicator, (indicator_x, indicator_y))
             indicator = Rect(indicator_x, indicator_y, indicator_width, indicator_height)
-            #            indicator.set_alpha(128)
             pygame.draw.rect(self.surface, FIFTIES_ORANGE, indicator)
 
     def draw_items(self):
@@ -673,7 +664,7 @@ class ItemList(Widget):
         return self.item_selected_index
 
     def pages_count(self):
-        """ :return: The number of pages filled with list items. """
+        """ :return: The number of pages filled with list items """
         items_count = len(self.list)
         page_count = int(math.ceil(items_count / self.items_per_page) + 1)
         return page_count
@@ -683,7 +674,7 @@ class ItemList(Widget):
         return self.list[self.active_item_index]
 
     def item_active_index_set(self, index):
-        if index >= 0 and index < len(list):
+        if 0 <= index < len(list):
             self.active_item_index = index
             self.draw()
 
@@ -692,23 +683,23 @@ class ItemList(Widget):
         return self.list[self.item_selected_index]
 
     def on_click(self, x_pos, y_pos):
-        """ Relays click action to a list item.
-        :param x_pos: The horizontal click position.
-        :param y_pos: The vertical click position.
+        """ Relays click action to a list item
+        :param x_pos: The horizontal click position
+        :param y_pos: The vertical click position
 
-        :return: return the ListItem's tag_name.
+        :return: return the ListItem's tag_name
         """
         self.clicked_item(x_pos, y_pos)
         return self.tag_name
 
     def show_next_items(self):
-        """ Shows next page of items. """
+        """ Shows next page of items """
         if self.page_showing_index * self.items_per_page + self.items_per_page < len(self.list):
             self.page_showing_index += 1
             self.draw()
 
     def show_prev_items(self):
-        """ Shows previous page of items. """
+        """ Shows previous page of items """
         if self.page_showing_index * self.items_per_page > 0:
             self.page_showing_index -= 1
             self.draw()
@@ -726,10 +717,9 @@ class ItemList(Widget):
 class WidgetContainer(Widget):
     """ Basic screen used for displaying widgets. This type of screen should be used for the entire program.
 
-        :param screen_rect: The screen's rectangle where the screen is drawn on
+        :param surface: The screen's rectangle where the screen is drawn on
 
         :ivar components: Dictionary holding the screen's widgets with a tag_name as key and the widget as value
-        :ivar color: The screen's background color, default = :py:const:BLACK
     """
 
     def __init__(self, tag_name, surface, x, y, width, height):
@@ -739,7 +729,7 @@ class WidgetContainer(Widget):
     def add_component(self, widget):
         """ Adds components to component list, thus ensuring a component is found on a mouse event.
 
-            :param widget: The widget that should be added to the dictionary.
+            :param widget: The widget that should be added to the dictionary
         """
         self.components[widget.tag_name] = widget
 
@@ -752,12 +742,12 @@ class WidgetContainer(Widget):
         pygame.display.update(self.rect)
 
     def on_click(self, x, y):
-        """ Determines which component was clicked and fires it's click function in turn.
+        """ Determines which component was clicked and fires its click function in turn.
 
-            :param x: The horizontal click position.
-            :param y: The vertical click position.
+            :param x: The horizontal click position
+            :param y: The vertical click position
 
-            :return: The tag_name of the clicked component.
+            :return: The tag_name of the clicked component
         """
         for key, value in self.components.items():
             if isinstance(value, ButtonIcon) or isinstance(value, ButtonText) or \
@@ -774,9 +764,9 @@ class WidgetContainer(Widget):
     def on_swipe(self, x, y, swipe_type):
         """ Relays swipe to ItemList components for next(up)/previous(down) swipes for ItemLists.
 
-            :param x: The horizontal start position of the swipe move.
-            :param y: The vertical start position of the swipe move.
-            :param swipe_type: The type of swipe movement done.
+            :param x: The horizontal start position of the swipe move
+            :param y: The vertical start position of the swipe move
+            :param swipe_type: The type of swipe movement done
         """
         for key, value in self.components.items():
             if isinstance(value, ItemList):
