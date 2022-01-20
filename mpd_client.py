@@ -117,7 +117,6 @@ class MPDNowPlaying(object):
         return binary
 
     def get_cover_art(self):
-
         blob_cover = self.get_cover_binary(self.file)
         if blob_cover is None:
             file_cover_art = "default_cover_art.png"
@@ -202,8 +201,6 @@ class MPDController(object):
 
             :return: Boolean indicating if the status was changed
         """
-        current_seconds = 0
-        current_total = 0
         logging.info("Trying to get mpd status")
         self.mpd_client.ping()
         try:
