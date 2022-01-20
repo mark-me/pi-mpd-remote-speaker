@@ -66,6 +66,8 @@ class ScreenPlaying(Screen):
                 if event == 'album_change':
                     file_img_cover = mpd.now_playing.get_cover_art()
                     self.components['pic_cover_art'].picture_set(file_img_cover)
+                if event == 'album_change' or event == 'playing_file':
+                    super(ScreenPlaying, self).show()
             except IndexError:
                 break
 
