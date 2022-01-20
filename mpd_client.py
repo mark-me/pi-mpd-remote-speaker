@@ -46,15 +46,15 @@ class MPDNowPlaying(object):
         self.__mpd_client = mpd_client
         self.playing_type = ''
         self.__now_playing = None
-        self.title = ""  # Currently playing song name
-        self.artist = ""  # Currently playing artist
+        self.title = ""  # Current playing song name
+        self.artist = ""  # Current playing artist
         self.album = ""  # Album the currently playing song is on
         self.file = ""  # File with path relative to MPD music directory
-        self.__time_current_sec = 0  # Currently playing song time (seconds)
-        self.time_current = ""  # Currently playing song time (string format)
-        self.__time_total_sec = 0  # Currently playing song duration (seconds)
-        self.time_total = ""  # Currently playing song duration (string format)
-        self.time_percentage = 0  # Currently playing song time as a percentage of the song duration
+        self.__time_current_sec = 0  # Current playing song time (seconds)
+        self.time_current = ""  # Current playing song time (string format)
+        self.__time_total_sec = 0  # Current playing song duration (seconds)
+        self.time_total = ""  # Current playing song duration (string format)
+        self.time_percentage = 0  # Current playing song time as a percentage of the song duration
         self.music_directory = ""
 
     def now_playing_set(self, now_playing=None):
@@ -266,7 +266,7 @@ class MPDController(object):
     def player_control_set(self, play_status):
         """ Controls playback
 
-            :param play_status: Playback action ['play', 'pause', 'stop', 'next', 'previous'].
+            :param play_status: Playback action ['play', 'pause', 'stop', 'next', 'previous']
         """
         logging.info("MPD player control %s", play_status)
         try:
