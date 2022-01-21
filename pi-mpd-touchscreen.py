@@ -23,7 +23,7 @@ import sys
 from time import sleep
 from mpd_client import *
 # from config_file import *
-# from settings import *
+from settings import *
 from screen_player import *
 # from screen_library import *
 # from screen_directory import *
