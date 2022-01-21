@@ -19,16 +19,12 @@
 **pi-mpd-touchscreen.py**: Main file
 """
 __author__ = 'Mark Zwart'
-import sys, pygame
-import logging
+import sys
 from time import sleep
-from pygame import *
-from gui_screens import *
+from mpd_client import *
 # from config_file import *
 # from settings import *
-from mpd_client import *
 from screen_player import *
-from mpd_client import *
 # from screen_library import *
 # from screen_directory import *
 # from screen_radio import *
