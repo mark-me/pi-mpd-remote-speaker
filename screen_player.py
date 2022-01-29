@@ -19,9 +19,11 @@
 **screen_player.py**: Playback screen.
 =======================================================
 """
+import mpd_client
 from gui_screens import *
 from mpd_client import *
 from settings import *
+from palette_building import *
 
 
 class ScreenPlaying(Screen):
@@ -58,6 +60,7 @@ class ScreenPlaying(Screen):
                 event = mpd.events.popleft()
                 playing = mpd.now_playing
                 logging.info("Update event: %s", event)
+
                 if event == 'time_elapsed':
                     self.components['slide_time'].draw(playing.time_percentage)
                 if event == 'playing_file':
