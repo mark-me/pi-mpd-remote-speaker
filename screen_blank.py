@@ -20,6 +20,7 @@
 =======================================================
 """
 from gui_screens import *
+logging.info("ScreenBlank definition")
 
 class ScreenBlank(Screen):
     """ Screen for blanking

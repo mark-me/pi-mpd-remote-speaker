@@ -22,7 +22,8 @@
 from gui_screens import *
 from mpd_client import *
 from settings import *
-from palette_building import *
+# from palette_building import *
+logging.info("ScreenPlaying definition")
 
 
 class ScreenPlaying(Screen):
