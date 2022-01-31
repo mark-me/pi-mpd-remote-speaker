@@ -62,12 +62,10 @@ class PiJukeboxScreens(ScreenControl):
         mpd_control_status = mpd.player_control_get()
         is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
         if is_playing and self.current_index != 0:
-            print("Is playing")
             self.blank_screen_time = self.timer() + BLANK_PERIOD
             self.current_index = 0
             self.show()
         elif not is_playing and self.timer() > self.blank_screen_time and self.current_index != 1:
-            print("Paused or stopped too long")
             self.current_index = 1
             self.show()
 
