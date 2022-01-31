@@ -25,6 +25,7 @@
 __author__ = 'Mark Zwart'
 
 import os
+os.environ['SDL_AUDIODRIVER'] = 'dsp'
 import pygame
 
 #: Switches between development/debugging on your desktop/laptop versus running on your Raspberry Pi
