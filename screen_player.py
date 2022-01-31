@@ -22,6 +22,7 @@
 from gui_screens import *
 from mpd_client import *
 from settings import *
+from palette_building import *
 
 
 class ScreenPlaying(Screen):
@@ -58,13 +59,16 @@ class ScreenPlaying(Screen):
                 event = mpd.events.popleft()
                 playing = mpd.now_playing
                 logging.info("Update event: %s", event)
+
                 if event == 'time_elapsed':
+                    self.blank_screen_time = self.timer() + BLANK_PERIOD
                     self.components['slide_time'].draw(playing.time_percentage)
                 if event == 'playing_file':
                     self.components['lbl_track_artist'].text_set(playing.artist)
                     self.components['lbl_track_title'].text_set(playing.title)
                 if event == 'album_change':
                     file_img_cover = mpd.now_playing.get_cover_art()
+                    # Use cover art to change screen component colors
                     self.components['pic_cover_art'].picture_set(file_img_cover)
                 if event == 'album_change' or event == 'playing_file':
                     super(ScreenPlaying, self).show()
