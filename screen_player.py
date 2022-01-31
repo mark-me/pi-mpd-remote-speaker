@@ -61,7 +61,6 @@ class ScreenPlaying(Screen):
                 logging.info("Update event: %s", event)
 
                 if event == 'time_elapsed':
-                    self.blank_screen_time = self.timer() + BLANK_PERIOD
                     self.components['slide_time'].draw(playing.time_percentage)
                 if event == 'playing_file':
                     self.components['lbl_track_artist'].text_set(playing.artist)

@@ -212,7 +212,7 @@ class MPDController(object):
                 self.events.append('playing_file')
             self.__radio_mode = self.now_playing.playing_type == 'radio'
             if self.now_playing.album == '' or self.now_playing.album != now_playing_new['album']:
-                logging.warning("Album change event added")
+                logging.info("Album change event added")
                 self.events.append('album_change')
             self.now_playing.now_playing_set(now_playing_new)
 
