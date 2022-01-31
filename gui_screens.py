@@ -46,7 +46,7 @@ ICO_WARNING = RESOURCES + 'icon_warning.png'
 ICO_ERROR = RESOURCES + 'icon_warning.png'
 
 #: Time-out period before screen goes blank (milliseconds)
-BLANK_PERIOD = 300000
+BLANK_PERIOD = 40000 # 300000
 
 
 class GestureDetector(object):
@@ -176,8 +176,6 @@ class Screen(object):
         self.components = {}  # Interface dictionary
         self.color = BLACK
         self.gesture_detect = GestureDetector()
-        self.timer = pygame.time.get_ticks
-        self.blank_screen_time = self.timer() + BLANK_PERIOD
 
     def add_component(self, widget):
         """ Adds components to component list, thus ensuring a component is found on a mouse event.
@@ -209,8 +207,6 @@ class Screen(object):
 
     def loop(self):
         """ Loops for events """
-        # Restart blank screen timer
-        self.blank_screen_time = self.timer() + BLANK_PERIOD
         while self.loop_active:
 
             pygame.time.wait(PYGAME_EVENT_DELAY)
@@ -274,26 +270,6 @@ class Screen(object):
                         component.show_next_items()
                     if swipe_type == GESTURE_SWIPE_DOWN:
                         component.show_prev_items()
-
-    def blank_screen(self):
-        # Drawing blank
-        window_rect = Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-        pygame.draw.rect(self.surface, BLACK, window_rect)
-        pygame.display.flip()
-        touched = 0
-        # Wait until tapped
-        while touched == 0:
-            for event in pygame.event.get():  # Do for all events in pygame's event queue
-                if event.type == MOUSEBUTTONDOWN:
-                    touched = 1
-        # Restart blank screen timer
-        self.blank_screen_time = self.timer() + BLANK_PERIOD
-        # Restore screen
-        self.surface.fill(self.color)
-        for key, value in self.components.items():
-            if value.visible:
-                value.draw()
-        pygame.display.flip()
 
 
 class ScreenModal(Screen):
