@@ -19,6 +19,8 @@
 **pi-mpd-touchscreen.py**: Main file
 """
 __author__ = 'Mark Zwart'
+
+import logging
 import sys
 from time import sleep
 from mpd_client import *
@@ -40,6 +42,7 @@ class PiJukeboxScreens(ScreenControl):
         updates on screen(s)
     """
     def __init__(self):
+        logging.info("Start screens")
         ScreenControl.__init__(self)
         self.timer = pygame.time.get_ticks
         self.blank_screen_time = self.timer() + BLANK_PERIOD

@@ -287,5 +287,5 @@ class MPDController(object):
         self.status_get()
         return self.__player_control
 
-
+logging.info("Start mpd controller")
 mpd = MPDController()

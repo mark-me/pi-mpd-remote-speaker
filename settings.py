@@ -24,6 +24,9 @@
 """
 __author__ = 'Mark Zwart'
 
+import logging
+
+logging.info("Start loading settings")
 import os
 os.environ['SDL_AUDIODRIVER'] = 'dsp'
 import pygame
