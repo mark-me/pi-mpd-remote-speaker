@@ -21,6 +21,10 @@
 __author__ = 'Mark Zwart'
 
 import logging
+
+logging.basicConfig(filename='pi-mpd-touchscreen.log',
+                    format='%(asctime)s:%(levelname)s:%(message)s',
+                    level=logging.INFO)
 import sys
 from time import sleep
 from mpd_client import *
@@ -94,9 +98,6 @@ class PiJukeboxScreens(ScreenControl):
 
 def main():
     """ The function where it all starts...."""
-    logging.basicConfig(filename='pi-mpd-touchscreen.log',
-                        format='%(asctime)s:%(levelname)s:%(message)s',
-                        level=logging.INFO)
     if "SSH_CONNECTION" in os.environ:
         print("Not starting pi-mpd-touchscreen, ssh session")
         
