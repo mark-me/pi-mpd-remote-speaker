@@ -25,6 +25,7 @@ from mpd_client import *
 # from config_file import *
 from settings import *
 from screen_player import *
+from screen_blank import *
 # from screen_library import *
 # from screen_directory import *
 # from screen_radio import *
@@ -40,8 +41,10 @@ class PiJukeboxScreens(ScreenControl):
     """
     def __init__(self):
         ScreenControl.__init__(self)
-
+        self.timer = pygame.time.get_ticks
+        self.blank_screen_time = self.timer() + BLANK_PERIOD
         self.add_screen(ScreenPlaying(SCREEN), self.loop_hook)  # Screen with now playing and cover art
+        self.add_screen(ScreenBlank(SCREEN), self.loop_hook)
         #self.add_screen(ScreenPlaylist(SCREEN), self.loop_hook)  # Create player with playlist screen
         #self.add_screen(ScreenLibrary(SCREEN), self.loop_hook)  # Create library browsing screen
         #self.add_screen(ScreenDirectory(SCREEN), self.loop_hook)  # Create directory browsing screen
@@ -52,7 +55,20 @@ class PiJukeboxScreens(ScreenControl):
         self.screen_list[self.current_index].update()
 
     def loop_hook(self):
-        return mpd.status_get()
+        mpd_status = mpd.status_get()
+        mpd_control_status = mpd.player_control_get()
+        is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
+        if is_playing and self.current_index != 0:
+            print("Is playing")
+            self.blank_screen_time = self.timer() + BLANK_PERIOD
+            self.current_index = 0
+            self.show()
+        elif not is_playing and self.timer() > self.blank_screen_time and self.current_index != 1:
+            print("Paused or stopped too long")
+            self.current_index = 1
+            self.show()
+
+        return mpd_status
 
     def update(self):
         pass
