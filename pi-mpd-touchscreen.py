@@ -95,7 +95,7 @@ def main():
     """ The function where it all starts...."""
     logging.basicConfig(filename='pi-mpd-touchscreen.log',
                         format='%(asctime)s:%(levelname)s:%(message)s',
-                        level=logging.WARNING)
+                        level=logging.INFO)
     if "SSH_CONNECTION" in os.environ:
         print("Not starting pi-mpd-touchscreen, ssh session")
         
