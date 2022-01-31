@@ -97,6 +97,8 @@ class PiJukeboxScreens(ScreenControl):
 
 
 def main():
+
+    logging.info("Starting main")
     """ The function where it all starts...."""
     if "SSH_CONNECTION" in os.environ:
         print("Not starting pi-mpd-touchscreen, ssh session")
