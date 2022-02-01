@@ -37,7 +37,6 @@ from screen_blank import *
 # from screen_radio import *
 # from screen_settings import *
 
-
 class PiJukeboxScreens(ScreenControl):
     """ Manages Pi Jukebox's main screens.
             - Player screen
@@ -48,6 +47,7 @@ class PiJukeboxScreens(ScreenControl):
     def __init__(self):
         logging.info("Start screens")
         ScreenControl.__init__(self)
+
         self.timer = pygame.time.get_ticks
         self.blank_screen_time = self.timer() + BLANK_PERIOD
         self.add_screen(ScreenPlaying(SCREEN), self.loop_hook)  # Screen with now playing and cover art
@@ -65,10 +65,11 @@ class PiJukeboxScreens(ScreenControl):
         mpd_status = mpd.status_get()
         mpd_control_status = mpd.player_control_get()
         is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
-        if is_playing and self.current_index != 0:
+        if is_playing:
             self.blank_screen_time = self.timer() + BLANK_PERIOD
-            self.current_index = 0
-            self.show()
+            if self.current_index != 0:
+                self.current_index = 0
+                self.show()
         elif not is_playing and self.timer() > self.blank_screen_time and self.current_index != 1:
             self.current_index = 1
             self.show()
