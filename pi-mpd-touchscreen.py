@@ -24,7 +24,7 @@ import logging
 
 logging.basicConfig(filename='pi-mpd-touchscreen.log',
                     format='%(asctime)s:%(levelname)s:%(message)s',
-                    level=logging.INFO)
+                    level=logging.WARNING)
 import sys
 from time import sleep
 from mpd_client import *
