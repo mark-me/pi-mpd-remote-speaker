@@ -25,6 +25,7 @@ import logging
 logging.basicConfig(filename='pi-mpd-touchscreen.log',
                     format='%(asctime)s:%(levelname)s:%(message)s',
                     level=logging.WARNING)
+import signal
 import sys
 from time import sleep
 from mpd_client import *
@@ -98,6 +99,7 @@ class PiJukeboxScreens(ScreenControl):
 
 
 def main():
+    signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit())
 
     logging.info("Starting main")
     """ The function where it all starts...."""

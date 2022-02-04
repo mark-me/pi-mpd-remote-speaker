@@ -1,0 +1,26 @@
+[Unit]
+Description=Pygame Console Demo
+
+[Service]
+Type=idle
+
+User=pi
+Group=pi
+SupplementaryGroups=video input dialout spi i2c gpio
+
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+
+TTYPath=/dev/tty1
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+Environment=PYTHONUNBUFFERED=TRUE
+
+ExecStartPre=/bin/chvt 1
+WorkingDirectory=/home/pi/pi-mpd-touchscreen
+ExecStart=/bin/bash -c '/home/pi/run.sh'
+
+[Install]
+WantedBy=multi-user.target
