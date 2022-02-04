@@ -68,6 +68,10 @@ class ScreenPlaying(Screen):
                     self.components['lbl_track_title'].text_set(playing.title)
                 if event == 'album_change':
                     file_img_cover = mpd.now_playing.get_cover_art()
+                    if file_img_cover == "default_cover_art.png":
+                        self.components['lbl_track_artist'].visible = True
+                    else:
+                        self.components['lbl_track_artist'].visible = False
                     # Use cover art to change screen component colors
                     self.components['pic_cover_art'].picture_set(file_img_cover)
                 if event == 'album_change' or event == 'playing_file':
