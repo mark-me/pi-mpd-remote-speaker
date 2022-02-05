@@ -19,10 +19,12 @@
 **screen_player.py**: Playback screen.
 =======================================================
 """
+import pygame
+
 from gui_screens import *
 from mpd_client import *
 from settings import *
-# from palette_building import *
+import numpy as np
 logging.info("ScreenPlaying definition")
 
 
@@ -45,6 +47,7 @@ class ScreenPlaying(Screen):
         self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_MID)
         self.components['lbl_track_title'].background_alpha_set(160)
         self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 3, SCREEN_WIDTH, 3))
+        self.coverart_color = 0
 
     def show(self):
         """ Displays the screen. """
@@ -74,6 +77,7 @@ class ScreenPlaying(Screen):
                         self.components['lbl_track_artist'].visible = False
                     # Use cover art to change screen component colors
                     self.components['pic_cover_art'].picture_set(file_img_cover)
+                    self.apply_color_theme()
                 if event == 'album_change' or event == 'playing_file':
                     super(ScreenPlaying, self).show()
             except IndexError:
@@ -105,6 +109,16 @@ class ScreenPlaying(Screen):
         self.add_component(Picture('pic_cover_art',
                                    self.surface, left_position, top_position, cover_size, cover_size,
                                    file_img_cover))
+
+    def apply_color_theme(self):
+        self.coverart_color = self.components['pic_cover_art'].color_main()
+        self.color = self.coverart_color[0]
+        self.components['slide_time'].bottom_color = self.coverart_color[0]
+        color_complimentary = np.subtract((255, 255, 255), self.color)
+        self.components['slide_time'].background_alpha = 160
+        self.components['slide_time'].progress_color = color_complimentary
+        self.components['lbl_track_artist'].font_color = color_complimentary
+        self.components['lbl_track_title'].font_color = color_complimentary
 
 
 class ScreenVolume(ScreenModal):
