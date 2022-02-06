@@ -37,7 +37,7 @@ class ScreenPlaying(Screen):
         # Cover art
         # self.draw_cover_art()
         self.add_component(Picture('pic_cover_art',
-                                   self.surface, 40, 0, 240, 240,
+                                   self.surface, 80, 0, 240, 240,
                                    "default_cover_art.png"))
         # Player specific labels
         self.add_component(LabelText('lbl_track_artist', self.surface, 0, 0, SCREEN_WIDTH, 18))
@@ -118,7 +118,9 @@ class ScreenPlaying(Screen):
         self.components['slide_time'].background_alpha = 160
         self.components['slide_time'].progress_color = color_complimentary
         self.components['lbl_track_artist'].font_color = color_complimentary
+        self.components['lbl_track_artist'].background_color = self.color
         self.components['lbl_track_title'].font_color = color_complimentary
+        self.components['lbl_track_title'].background_color = self.color
 
 
 class ScreenVolume(ScreenModal):
