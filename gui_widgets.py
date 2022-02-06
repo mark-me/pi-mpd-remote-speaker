@@ -26,6 +26,7 @@ __author__ = 'Mark Zwart'
 from pygame.locals import *
 import math
 from settings import *
+from PIL import Image
 
 # Alignment variables
 HOR_LEFT = 0
@@ -59,6 +60,7 @@ class Widget(object):
         self.outline_visible = False
         self.outline_color = WHITE
         self.background_color = BLACK
+        self.background_alpha = 255
         self.font = FONT
         self.font_color = FIFTIES_YELLOW
         self.font_height = self.font.size('Tg')[1]
@@ -165,18 +167,23 @@ class Slider2(Widget):
 
     def __init__(self, tag_name, surface, x, y, width, height):
         Widget.__init__(self, tag_name, surface, x, y, width, height)
-        self.bottom_color = FIFTIES_CHARCOAL
+        self.bottom_color = BLACK
         self.bottom_rect = (x, y + height, width, 1)
+        self.background = pygame.Surface((self.width, self.height))
+
         self.progress_color = FIFTIES_ORANGE
         self.progress_percentage = 0
         self.progress_rect = Rect(x, y, 1, height)
         self.caption_visible = False
 
     def draw(self, percentage=None):
+
+        self.background.fill(self.bottom_color)
+        self.background.set_alpha(self.background_alpha)
+        SCREEN.blit(self.background, (self.x_pos, self.y_pos))
+
         if percentage is not None:
             self.progress_percentage_set(percentage)
-        self.surface.fill(self.background_color, self.rect)  # Background
-        self.surface.fill(self.bottom_color, self.bottom_rect)
         if self.progress_percentage > 0:
             self.surface.fill(self.progress_color, self.progress_rect)  # Progress bar
         pygame.display.update(self.rect)
@@ -236,6 +243,29 @@ class Picture(Widget):
         """ Sets the filename of the picture. """
         self.__image_file = file_name
         self.draw()
+
+    def picture_filename_get(self):
+        return self.__image_file
+
+    def color_main(self, qty_colors=3):
+
+        image = Image.open(self.__image_file)
+        image = image.copy()
+        image = image.crop((0, 0, 20, 240))
+
+        # Reduce to palette
+        paletted = image.convert('P', palette=Image.ADAPTIVE, colors=qty_colors)
+
+        # Find dominant colors
+        palette = paletted.getpalette()
+        color_counts = sorted(paletted.getcolors(), reverse=True)
+        colors = list()
+        for i in range(qty_colors):
+            palette_index = color_counts[i][1]
+            dominant_color = palette[palette_index * 3:palette_index * 3 + 3]
+            colors.append(tuple(dominant_color))
+
+        return colors
 
 
 class LabelText(Widget):

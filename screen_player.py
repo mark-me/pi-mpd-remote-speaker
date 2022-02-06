@@ -19,10 +19,12 @@
 **screen_player.py**: Playback screen.
 =======================================================
 """
+import pygame
+
 from gui_screens import *
 from mpd_client import *
 from settings import *
-# from palette_building import *
+import numpy as np
 logging.info("ScreenPlaying definition")
 
 
@@ -35,7 +37,7 @@ class ScreenPlaying(Screen):
         # Cover art
         # self.draw_cover_art()
         self.add_component(Picture('pic_cover_art',
-                                   self.surface, 40, 0, 240, 240,
+                                   self.surface, 80, 0, 240, 240,
                                    "default_cover_art.png"))
         # Player specific labels
         self.add_component(LabelText('lbl_track_artist', self.surface, 0, 0, SCREEN_WIDTH, 18))
@@ -45,13 +47,15 @@ class ScreenPlaying(Screen):
         self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_MID)
         self.components['lbl_track_title'].background_alpha_set(160)
         self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 3, SCREEN_WIDTH, 3))
+        self.coverart_color = 0
 
     def show(self):
         """ Displays the screen. """
         self.components['pic_cover_art'].picture_set(mpd.now_playing.get_cover_art())
         self.components['lbl_track_title'].text_set(mpd.now_playing.title)
         self.components['lbl_track_artist'].text_set(mpd.now_playing.artist)
-        self.components['lbl_track_artist'].visible = True
+        # self.components['lbl_track_artist'].visible = True
+        self.apply_color_theme()
         return super(ScreenPlaying, self).show()  # Draw screen
 
     def update(self):
@@ -68,12 +72,8 @@ class ScreenPlaying(Screen):
                     self.components['lbl_track_title'].text_set(playing.title)
                 if event == 'album_change':
                     file_img_cover = mpd.now_playing.get_cover_art()
-                    if file_img_cover == "default_cover_art.png":
-                        self.components['lbl_track_artist'].visible = True
-                    else:
-                        self.components['lbl_track_artist'].visible = False
-                    # Use cover art to change screen component colors
                     self.components['pic_cover_art'].picture_set(file_img_cover)
+                    self.apply_color_theme()
                 if event == 'album_change' or event == 'playing_file':
                     super(ScreenPlaying, self).show()
             except IndexError:
@@ -105,6 +105,28 @@ class ScreenPlaying(Screen):
         self.add_component(Picture('pic_cover_art',
                                    self.surface, left_position, top_position, cover_size, cover_size,
                                    file_img_cover))
+
+    def apply_color_theme(self):
+        self.coverart_color = self.components['pic_cover_art'].color_main()
+        self.color = self.coverart_color[0]
+        self.components['slide_time'].bottom_color = self.coverart_color[0]
+        color_complimentary = np.subtract((255, 255, 255), self.color)
+        luminance = (color_complimentary[0] * 0.2989 + color_complimentary[1] * 0.5870 + color_complimentary[2] * 0.1140) / 255
+        if luminance < .5:
+            color_font = (0, 0, 0)
+        else:
+            color_font = (255, 255, 255)
+
+        self.components['slide_time'].background_alpha = 160
+        self.components['slide_time'].progress_color = color_complimentary
+        self.components['lbl_track_artist'].font_color = color_font
+        self.components['lbl_track_artist'].background_color = self.color
+        self.components['lbl_track_title'].font_color = color_font
+        self.components['lbl_track_title'].background_color = self.color
+        if self.components['pic_cover_art'].picture_filename_get() == "default_cover_art.png":
+            self.components['lbl_track_artist'].visible = True
+        else:
+            self.components['lbl_track_artist'].visible = False
 
 
 class ScreenVolume(ScreenModal):
