@@ -111,8 +111,7 @@ class ScreenPlaying(Screen):
         self.color = self.coverart_color[0]
         self.components['slide_time'].bottom_color = self.coverart_color[0]
         color_complimentary = np.subtract((255, 255, 255), self.color)
-        luminance = (color_complimentary[0] * 0.2989 + color_complimentary[1] * 0.5870 + color_complimentary[2] * 0.1140)/255
-        print(luminance)
+        luminance = (color_complimentary[0] * 0.2989 + color_complimentary[1] * 0.5870 + color_complimentary[2] * 0.1140) / 255
         if luminance < .5:
             color_font = (0, 0, 0)
         else:
