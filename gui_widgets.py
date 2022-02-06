@@ -244,10 +244,14 @@ class Picture(Widget):
         self.__image_file = file_name
         self.draw()
 
+    def picture_filename_get(self):
+        return self.__image_file
+
     def color_main(self, qty_colors=3):
 
         image = Image.open(self.__image_file)
         image = image.copy()
+        image = image.crop((0, 0, 20, 240))
 
         # Reduce to palette
         paletted = image.convert('P', palette=Image.ADAPTIVE, colors=qty_colors)

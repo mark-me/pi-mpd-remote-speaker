@@ -54,7 +54,8 @@ class ScreenPlaying(Screen):
         self.components['pic_cover_art'].picture_set(mpd.now_playing.get_cover_art())
         self.components['lbl_track_title'].text_set(mpd.now_playing.title)
         self.components['lbl_track_artist'].text_set(mpd.now_playing.artist)
-        self.components['lbl_track_artist'].visible = True
+        # self.components['lbl_track_artist'].visible = True
+        self.apply_color_theme()
         return super(ScreenPlaying, self).show()  # Draw screen
 
     def update(self):
@@ -71,11 +72,6 @@ class ScreenPlaying(Screen):
                     self.components['lbl_track_title'].text_set(playing.title)
                 if event == 'album_change':
                     file_img_cover = mpd.now_playing.get_cover_art()
-                    if file_img_cover == "default_cover_art.png":
-                        self.components['lbl_track_artist'].visible = True
-                    else:
-                        self.components['lbl_track_artist'].visible = False
-                    # Use cover art to change screen component colors
                     self.components['pic_cover_art'].picture_set(file_img_cover)
                     self.apply_color_theme()
                 if event == 'album_change' or event == 'playing_file':
@@ -115,12 +111,23 @@ class ScreenPlaying(Screen):
         self.color = self.coverart_color[0]
         self.components['slide_time'].bottom_color = self.coverart_color[0]
         color_complimentary = np.subtract((255, 255, 255), self.color)
+        luminance = (color_complimentary[0] * 0.2989 + color_complimentary[1] * 0.5870 + color_complimentary[2] * 0.1140)/255
+        print(luminance)
+        if luminance < .5:
+            color_font = (0, 0, 0)
+        else:
+            color_font = (255, 255, 255)
+
         self.components['slide_time'].background_alpha = 160
         self.components['slide_time'].progress_color = color_complimentary
-        self.components['lbl_track_artist'].font_color = color_complimentary
+        self.components['lbl_track_artist'].font_color = color_font
         self.components['lbl_track_artist'].background_color = self.color
-        self.components['lbl_track_title'].font_color = color_complimentary
+        self.components['lbl_track_title'].font_color = color_font
         self.components['lbl_track_title'].background_color = self.color
+        if self.components['pic_cover_art'].picture_filename_get() == "default_cover_art.png":
+            self.components['lbl_track_artist'].visible = True
+        else:
+            self.components['lbl_track_artist'].visible = False
 
 
 class ScreenVolume(ScreenModal):
