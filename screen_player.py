@@ -140,8 +140,8 @@ class ScreenVolume(ScreenModal):
         self.window_width -= 2 * self.window_x
         self.window_height -= 2 * self.window_y
         self.outline_shown = True
-        self.title_color = FIFTIES_GREEN
-        self.outline_color = FIFTIES_GREEN
+        self.title_color = GREEN
+        self.outline_color = GREEN
 
         self.add_component(ButtonIcon('btn_mute', self.surface, ICO_VOLUME_MUTE, self.window_x + 5, self.window_y + 25))
         self.components['btn_mute'].x_pos = self.window_x + self.window_width / 2 - self.components[
@@ -156,7 +156,7 @@ class ScreenVolume(ScreenModal):
         self.add_component(
             ButtonText('btn_back', self.surface, self.window_x + self.window_width / 2 - 23, self.window_y + 98, 46, 32,
                        "Back"))
-        self.components['btn_back'].button_color = FIFTIES_TEAL
+        self.components['btn_back'].button_color = CREAM
 
     def on_click(self, x, y):
         tag_name = super(ScreenModal, self).on_click(x, y)

@@ -67,18 +67,6 @@ WHITE = 255, 255, 255
 YELLOW = 255, 255, 0
 RED = 255, 0, 0
 GREEN = 0, 255, 0
-# Scheme aqua (currently not in use)
-AQUA_TEAL = 18, 151, 147
-AQUA_CHARCOAL = 80, 80, 80
-AQUA_YELLOW = 255, 245, 195
-AQUA_BLUE = 155, 215, 213
-AQUA_PINK = 255, 114, 96
-# Scheme FIFTIES
-FIFTIES_CHARCOAL = 124, 120, 106
-FIFTIES_TEAL = 66, 143, 128
-FIFTIES_GREEN = 211, 227, 151
-FIFTIES_YELLOW = 255, 245, 195
-FIFTIES_ORANGE = 235, 110, 68
 
 """ Mouse related variables """
 GESTURE_MOVE_MIN = 50  # Minimum movement in pixels to call it a move

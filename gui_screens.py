@@ -288,9 +288,9 @@ class ScreenModal(Screen):
         self.window_width = SCREEN_WIDTH
         self.window_height = SCREEN_HEIGHT
         self.return_object = None
-        self.title_color = FIFTIES_ORANGE
+        self.title_color = CREAM
         self.outline_shown = True
-        self.outline_color = FIFTIES_ORANGE
+        self.outline_color = CREAM
 
     def show(self):
         self.__draw_window()
@@ -341,17 +341,17 @@ class ScreenMessage(ScreenModal):
         if message_type == 'information':
             self.add_component(
                 Picture('pic_icon', self.surface, self.window_x + 5, self.window_y + 30, 48, 48, ICO_INFO))
-            self.title_color = FIFTIES_GREEN
+            self.title_color = GREEN
         elif message_type == 'warning':
             self.add_component(
                 Picture('pic_icon', self.surface, self.window_x + 5, self.window_y + 30, 48, 48, ICO_WARNING))
-            self.title_color = FIFTIES_YELLOW
+            self.title_color = YELLOW
         elif message_type == 'error':
             self.add_component(
                 Picture('pic_icon', self.surface, self.window_x + 5, self.window_y + 30, 48, 48, ICO_ERROR))
-            self.title_color = FIFTIES_ORANGE
+            self.title_color = RED
         else:
-            self.title_color = FIFTIES_TEAL
+            self.title_color = BLUE
         x = self.window_x + 55
         y = self.window_y + 30
         width = self.window_width - x - 5
@@ -359,7 +359,7 @@ class ScreenMessage(ScreenModal):
         self.add_component(Memo('memo_text', self.surface, x, y, width, height, text))
         self.add_component(ButtonText('btn_ok', self.surface, self.window_x + self.window_width - 60,
                                       self.window_y + self.window_height - 37, 55, 32, "OK"))
-        self.components['btn_ok'].button_color = FIFTIES_YELLOW
+        self.components['btn_ok'].button_color = CREAM
 
     def on_click(self, x, y):
         tag_name = super(ScreenModal, self).on_click(x, y)
@@ -384,17 +384,17 @@ class ScreenYesNo(ScreenModal):
         self.outline_shown = True
         self.add_component(
             Picture('pic_icon', self.surface, self.window_x + 5, self.window_y + 30, 48, 48, ICO_WARNING))
-        self.title_color = FIFTIES_ORANGE
+        self.title_color = CREAM
         width = self.window_width - 58
         height = self.window_height - self.window_y - 32
         self.add_component(Memo('memo_text', self.surface, self.window_x + 55, self.window_y + 32, width, height, text))
         self.add_component(ButtonText('btn_yes', self.surface, self.window_x + self.window_width - 60,
                                       self.window_y + self.window_height - 37, 55, 32, "Yes"))
-        self.components['btn_yes'].button_color = FIFTIES_ORANGE
+        self.components['btn_yes'].button_color = CREAM
         self.add_component(
             ButtonText('btn_no', self.surface, self.window_x + 5, self.window_y + self.window_height - 37, 55, 32,
                        "No"))
-        self.components['btn_no'].button_color = FIFTIES_ORANGE
+        self.components['btn_no'].button_color = CREAM
 
     def on_click(self, x, y):
         tag_name = super(ScreenModal, self).on_click(x, y)

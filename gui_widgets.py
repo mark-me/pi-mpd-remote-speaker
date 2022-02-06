@@ -62,14 +62,14 @@ class Widget(object):
         self.background_color = BLACK
         self.background_alpha = 255
         self.font = FONT
-        self.font_color = FIFTIES_YELLOW
+        self.font_color = CREAM
         self.font_height = self.font.size('Tg')[1]
 
     def on_click(self, x, y):
         """ The function called when a widget is clicked """
         return self.tag_name
 
-    def set_font(self, font_name, font_size, font_color=FIFTIES_YELLOW):
+    def set_font(self, font_name, font_size, font_color=CREAM):
         self.font = pygame.font.Font(font_name, font_size)
         self.font_color = font_color
 
@@ -94,7 +94,7 @@ class Rectangle(Widget):
 
     def __init__(self, tag_name, surface, x, y, width, height):
         Widget.__init__(self, tag_name, surface, x, y, width, height)
-        self.background_color = FIFTIES_CHARCOAL
+        self.background_color = BLACK
 
     def draw(self):
         """ Draws the label. """
@@ -115,7 +115,7 @@ class Slider(Rectangle):
 
     def __init__(self, tag_name, surface, x, y, width, height):
         Rectangle.__init__(self, tag_name, surface, x, y, width, height)
-        self.progress_color = FIFTIES_GREEN
+        self.progress_color = GREEN
         self.progress_percentage = 0
         self.progress_rect = Rect(x + 1, y + 1, 1, height - 2)
         self.caption_visible = True
@@ -171,7 +171,7 @@ class Slider2(Widget):
         self.bottom_rect = (x, y + height, width, 1)
         self.background = pygame.Surface((self.width, self.height))
 
-        self.progress_color = FIFTIES_ORANGE
+        self.progress_color = CREAM
         self.progress_percentage = 0
         self.progress_rect = Rect(x, y, 1, height)
         self.caption_visible = False
@@ -288,7 +288,7 @@ class LabelText(Widget):
         self.indent_horizontal = 0
         self.indent_vertical = 0
         self.outline_show = False
-        self.outline_color = FIFTIES_CHARCOAL
+        self.outline_color = BLACK
         self.background_alpha = 255
 
     def transparent_set(self, value):
@@ -382,7 +382,7 @@ class Memo(Widget):
         self.alignment_horizontal = HOR_LEFT
         self.indent_horizontal = 0
         self.outline_show = False
-        self.outline_color = FIFTIES_CHARCOAL
+        self.outline_color = BLACK
         self.background_alpha = 255
 
     def draw(self, text=None):
@@ -511,7 +511,7 @@ class ButtonText(LabelText):
         LabelText.__init__(self, tag_name, surface, x, y, width, height, text)
         self.transparent_set(True)
         self.button_rect = (x + 1, y + 1, width - 2, height - 2)
-        self.button_color = FIFTIES_YELLOW
+        self.button_color = CREAM
         self.__background_left = None
         self.__background_middle = None
         self.__background_right = None
@@ -647,7 +647,7 @@ class ItemList(Widget):
             indicator_x = self.x_pos + self.width - indicator_width
             indicator_y = self.y_pos + self.page_showing_index * indicator_height
             indicator = Rect(indicator_x, indicator_y, indicator_width, indicator_height)
-            pygame.draw.rect(self.surface, FIFTIES_ORANGE, indicator)
+            pygame.draw.rect(self.surface, CREAM, indicator)
 
     def draw_items(self):
         """ Draws the list items. """
