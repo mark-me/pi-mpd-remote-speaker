@@ -227,11 +227,11 @@ class Picture(Widget):
     def __init__(self, tag_name, surface, x, y, width, height, image_file=""):
         Widget.__init__(self, tag_name, surface, x, y, width, height)
         self.__image_file = image_file
-        self.__image = pygame.image.load(image_file).convert()
+        self.__image = pygame.image.load(image_file)
         self.__image = pygame.transform.scale(self.__image, (self.width, self.height))
 
     def draw(self):
-        self.__image = pygame.image.load(self.__image_file).convert_alpha()
+        self.__image = pygame.image.load(self.__image_file)
         self.__image = pygame.transform.smoothscale(self.__image, (self.width, self.height))
         SCREEN.blit(self.__image, (self.x_pos, self.y_pos))
         pygame.display.update(self.rect)
@@ -254,11 +254,13 @@ class Picture(Widget):
         image = image.crop((0, 0, 20, 240))
 
         # Reduce to palette
-        paletted = image.convert('P', palette=Image.ADAPTIVE, colors=qty_colors)
+        #paletted = image.convert('P', palette=Image.ADAPTIVE, colors=qty_colors)
+        paletted = image.convert('P', palette=Image.ADAPTIVE)
 
         # Find dominant colors
         palette = paletted.getpalette()
         color_counts = sorted(paletted.getcolors(), reverse=True)
+        qty_colors = min(qty_colors, len(color_counts))
         colors = list()
         for i in range(qty_colors):
             palette_index = color_counts[i][1]
