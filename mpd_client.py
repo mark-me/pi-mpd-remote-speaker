@@ -200,11 +200,14 @@ class MPDController(object):
         """
         logging.info("Trying to get mpd status")
         self.mpd_client.ping()
-        try:
-            now_playing_new = self.mpd_client.currentsong()
-        except Exception:
-            logging.error("Couldn't get mpd current song")
-            return False
+        for i in range(0, 100):
+            while True:
+                try:
+                    now_playing_new = self.mpd_client.currentsong()
+                except Exception:
+                    logging.error("Couldn't get mpd current song")
+                    continue
+                break
 
         if self.now_playing != now_playing_new and len(now_playing_new) > 0:  # Changed to a new song
             self.__now_playing_changed = True
