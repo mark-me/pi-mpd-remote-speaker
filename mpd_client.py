@@ -23,6 +23,7 @@ import logging
 
 import pygame
 import os
+import time
 import mpd
 from collections import deque
 
@@ -32,6 +33,40 @@ MPD_TYPE_SONGS = 'title'
 
 DEFAULT_COVER = 'default_cover_art.png'
 TEMP_PLAYLIST_NAME = '_pi-jukebox_temp'
+
+
+def retry(func, ex_type=Exception, limit=0, wait_ms=100, wait_increase_ratio=2, logger=None):
+    """
+    Retry a function invocation until no exception occurs
+    :param func: function to invoke
+    :param ex_type: retry only if exception is subclass of this type
+    :param limit: maximum number of invocation attempts
+    :param wait_ms: initial wait time after each attempt in milliseconds.
+    :param wait_increase_ratio: increase wait period by multiplying this value after each attempt.
+    :param logger: if not None, retry attempts will be logged to this logging.logger
+    :return: result of first successful invocation
+    :raises: last invocation exception if attempts exhausted or exception is not an instance of ex_type
+    """
+    attempt = 1
+    while True:
+        try:
+            return func()
+        except Exception as ex:
+            if not isinstance(ex, ex_type):
+                raise ex
+            if 0 < limit <= attempt:
+                if logger:
+                    logger.warning("no more attempts")
+                raise ex
+
+            if logger:
+                logger.error("failed execution attempt #%d", attempt, exc_info=ex)
+
+            attempt += 1
+            if logger:
+                logger.info("waiting %d ms before attempt #%d", wait_ms, attempt)
+            time.sleep(wait_ms / 1000)
+            wait_ms *= wait_increase_ratio
 
 
 class MPDNowPlaying(object):
@@ -107,9 +142,9 @@ class MPDNowPlaying(object):
             try:
                 logging.warning("Could not retrieve album cover using albumart() of %s", uri)
                 binary = self.__mpd_client.readpicture(uri)["binary"]
-                logging.info("After second try to get cover art")
+                logging.info("After second try to get cover art using readpicture() of %s", uri)
             except:
-                logging.error("Could not retrieve album cover of %s", uri)
+                logging.warning("Could not retrieve album cover of %s", uri)
                 binary = None
         return binary
 
@@ -180,7 +215,7 @@ class MPDController(object):
         try:
             self.mpd_client.connect(self.host, self.port)
         except Exception:
-            logging.error("Failed to connect to MPD server")
+            logging.error("Failed to connect to MPD server: host: ", self.host, " port: ", self.port)
             return False
 
         self.now_playing.now_playing_set(self.mpd_client.currentsong())
@@ -200,11 +235,7 @@ class MPDController(object):
         """
         logging.info("Trying to get mpd status")
         self.mpd_client.ping()
-        try:
-            now_playing_new = self.mpd_client.currentsong()
-        except Exception:
-            logging.error("Couldn't get mpd current song")
-
+        now_playing_new = retry(self.mpd_client.currentsong, logger=logging)
 
         if self.now_playing != now_playing_new and len(now_playing_new) > 0:  # Changed to a new song
             self.__now_playing_changed = True
@@ -216,11 +247,8 @@ class MPDController(object):
                 self.events.append('album_change')
             self.now_playing.now_playing_set(now_playing_new)
 
-        try:
-            status = self.mpd_client.status()
-        except Exception:
-            logging.error("Couldn't get mpd status")
-            return False
+        status = retry(self.mpd_client.status, logger=logging)
+
         if self.__status == status:
             return False
         self.__status = status
@@ -286,6 +314,7 @@ class MPDController(object):
         """ :return: Current playback mode. """
         self.status_get()
         return self.__player_control
+
 
 logging.info("Start mpd controller")
 mpd = MPDController()
