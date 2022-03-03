@@ -13,7 +13,7 @@ case $SSH_CONNECTION in
   writelog "Starting"
   cd pi-mpd-touchscreen
   while true ; do
-    "$COMMAND"
+    python3 pi-mpd-touchscreen.py
     writelog "Exited with status $?"
     writelog "Restarting"
   done
