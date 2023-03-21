@@ -89,23 +89,6 @@ ICO_SWITCH_ON = RESOURCES + 'switch_on_48x32.png'
 ICO_SWITCH_OFF = RESOURCES + 'switch_off_48x32.png'
 ICO_MODAL_CANCEL = RESOURCES + 'back_22x18.png'
 
-# General icons
-ICO_PLAYER_FILE = RESOURCES + 'playing_file_48x32.png'
-ICO_PLAYER_FILE_ACTIVE = RESOURCES + 'playing_file_active_48x32.png'
-ICO_PLAYER_RADIO = RESOURCES + 'playing_radio_48x32.png'
-ICO_PLAYER_RADIO_ACTIVE = RESOURCES + 'playing_radio_active_48x32.png'
-ICO_PLAYLIST = RESOURCES + 'playlist_48x32.png'
-ICO_PLAYLIST_ACTIVE = RESOURCES + 'playlist_active_48x32.png'
-ICO_LIBRARY = RESOURCES + 'library_48x32.png'
-ICO_LIBRARY_ACTIVE = RESOURCES + 'library_active_48x32.png'
-ICO_DIRECTORY = RESOURCES + 'directory_48x32.png'
-ICO_DIRECTORY_ACTIVE = RESOURCES + 'directory_active_48x32.png'
-ICO_RADIO = RESOURCES + 'radio_48x32.png'
-ICO_RADIO_ACTIVE = RESOURCES + 'radio_active_48x32.png'
-ICO_SETTINGS = RESOURCES + 'settings_48x32.png'
-ICO_SETTINGS_ACTIVE = RESOURCES + 'settings_active_48x32.png'
-ICO_BACK = RESOURCES + 'back_48x32.png'
-
 # Player icons
 PIC_PLAY = RESOURCES + 'play.png'
 ICO_MENU = RESOURCES + 'menu_80x50.png'
@@ -119,23 +102,3 @@ ICO_VOLUME_UP = RESOURCES + 'vol_up_48x32.png'
 ICO_VOLUME_DOWN = RESOURCES + 'vol_down_48x32.png'
 ICO_VOLUME_MUTE = RESOURCES + 'vol_mute_48x32.png'
 ICO_VOLUME_MUTE_ACTIVE = RESOURCES + 'vol_mute_active_48x32.png'
-
-# Library icons
-ICO_SEARCH = RESOURCES + 'search_48x32.png'
-ICO_SEARCH_ACTIVE = RESOURCES + 'search_active_48x32.png'
-ICO_SEARCH_ARTIST = RESOURCES + 'artists_48x32.png'
-ICO_SEARCH_ARTIST_ACTIVE = RESOURCES + 'artists_active_48x32.png'
-ICO_SEARCH_ALBUM = RESOURCES + 'albums_48x32.png'
-ICO_SEARCH_ALBUM_ACTIVE = RESOURCES + 'albums_active_48x32.png'
-ICO_SEARCH_SONG = RESOURCES + 'songs_48x32.png'
-ICO_SEARCH_SONG_ACTIVE = RESOURCES + 'songs_active_48x32.png'
-ICO_PLAYLISTS = RESOURCES + 'playlists_48x32.png'
-ICO_PLAYLISTS_ACTIVE = RESOURCES + 'playlists_active_48x32.png'
-
-# Directory icons
-ICO_FOLDER_ROOT = RESOURCES + 'folder_root_48x32.png'
-ICO_FOLDER_UP = RESOURCES + 'folder_up_48x32.png'
-
-# Radio icons
-ICO_STATION_ADD = RESOURCES + 'station_add_48x32.png'
-COVER_ART_RADIO = RESOURCES + 'radio_cover_art.png'
