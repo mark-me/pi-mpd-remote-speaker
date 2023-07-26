@@ -13,6 +13,16 @@ hdmi_cvt 480 800 60 6 0 0 0
 dtoverlay=ads7846,cs=1,penirq=25,penirq_pull=2,speed=50000,keep_vref_on=0,swapxy=0,pmax=255,xohms=150,xmin=200,xmax=3900,ymin=200,ymax=3900
 display_rotate=3
 ```
+Edit rc.local
+```
+sudo nano /etc/rc.local
+```
+Add before exit 0
+```
+# disable console blanking on PiTFT
+sudo sh -c "TERM=linux setterm -blank 0 >/dev/tty0"
+```
+
 
 ## Install snapclient
 ```
