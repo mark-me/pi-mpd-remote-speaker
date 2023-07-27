@@ -195,7 +195,7 @@ class MPDController(object):
 
     def __init__(self):
         self.mpd_client = mpd.MPDClient()
-        self.host = '192.168.178.25'
+        self.host = '192.168.0.25'
         self.port = 6600
         self.update_interval = 1000  # Interval between mpc status update calls (milliseconds)
         self.volume = 0  # Playback volume
