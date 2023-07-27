@@ -23,6 +23,15 @@ Add before exit 0
 sudo sh -c "TERM=linux setterm -blank 0 >/dev/tty0"
 ```
 
+## Install OH-MY-ZSH
+
+```
+sudo apt install curl wget git
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+nano ~/.zshrc
+```
 
 ## Install snapclient
 ```
@@ -30,8 +39,6 @@ sudo apt install snapclient -y
 sudo service snapclient enable
 sudo service snapclient start
 ```
-
-
 
 ## Install app
 
