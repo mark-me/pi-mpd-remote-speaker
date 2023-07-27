@@ -2,6 +2,13 @@
 Touchscreen controller for MPD server
 
 ## Install screen
+
+```
+git clone https://github.com/waveshare/LCD-show.git
+cd LCD-show
+./LCD-hdmi
+```
+
 ```
 sudo nano /boot/config.txt
 ```
