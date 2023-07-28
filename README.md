@@ -60,7 +60,7 @@ git clone https://github.com/mark-me/pi-mpd-touchscreen.git
 ```
 sudo apt install python3-pip python3-virtualenv -y
 cd pi-mpd-touchscreen
-virtualenv env
-source env/bin/activate
+virtualenv .env
+source .env/bin/activate
 pip install -r requirements.txt
 ```
