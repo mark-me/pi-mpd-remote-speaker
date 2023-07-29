@@ -55,7 +55,7 @@ else:
 RESOURCES = os.path.dirname(__file__) + '/resources/'
 
 #: Standard font type
-FONT = pygame.font.Font(RESOURCES + 'DroidSans.ttf', 14)
+FONT = pygame.font.Font(RESOURCES + 'DroidSans.ttf', 24)
 
 """ Color definitions """
 BLUE = 0, 148, 255
