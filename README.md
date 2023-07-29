@@ -54,6 +54,7 @@ sudo service snapclient start
 ```
 git config --global user.name "Mark Zwart"
 git config --global user.email "mark.zwart@pobox.com"
+git config credential.helper store
 git clone https://github.com/mark-me/pi-mpd-touchscreen.git
 ```
 
