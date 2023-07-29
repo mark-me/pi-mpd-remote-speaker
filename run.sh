@@ -13,10 +13,11 @@ case $SSH_CONNECTION in
   writelog "Starting"
   cd pi-mpd-touchscreen
   while true ; do
+    source ".env/bin/activate"
     python3 pi-mpd-touchscreen.py
     writelog "Exited with status $?"
     writelog "Restarting"
+    deactivate
   done
   cd .. ;;
 esac
-
