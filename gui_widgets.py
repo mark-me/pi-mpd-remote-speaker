@@ -169,6 +169,7 @@ class Slider2(Widget):
         Widget.__init__(self, tag_name, surface, x, y, width, height)
         self.bottom_color = BLACK
         self.bottom_rect = (x, y + height, width, 1)
+        self.background_alpha = 160
         self.background = pygame.Surface((self.width, self.height))
 
         self.progress_color = CREAM
