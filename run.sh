@@ -17,6 +17,7 @@ case $SSH_CONNECTION in
     deactivate
     writelog "Exited with status $?"
     writelog "Restarting"
+    deactivate
   done
   cd .. ;;
 esac
