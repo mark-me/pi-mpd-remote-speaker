@@ -32,18 +32,16 @@ os.environ['SDL_AUDIODRIVER'] = 'dsp'
 import pygame
 
 #: Switches between development/debugging on your desktop/laptop versus running on your Raspberry Pi
-RUN_ON_RASPBERRY_PI = os.uname()[4][:3] == 'arm'
+RUN_ON_RASPBERRY_PI = os.uname()[4] == 'aarch64'
 
 # Setting up touch screen, set if statement to true on Raspberry Pi
 if RUN_ON_RASPBERRY_PI:
     os.environ['SDL_FBDEV'] = '/dev/fb1'
-    os.environ['SDL_MOUSEDEV'] = '/dev/input/touchscreen'
-    os.environ['SDL_MOUSEDRV'] = 'TSLIB'
 
 # Display settings
 pygame.init() 	# Pygame initialization
 #: The display dimensions, change this if you have a bigger touch screen.
-DISPLAY_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 320, 240
+DISPLAY_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 480, 800
 PYGAME_EVENT_DELAY = 25
 
 if RUN_ON_RASPBERRY_PI:  # If started on Raspberry Pi
