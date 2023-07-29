@@ -43,7 +43,7 @@ class ScreenPlaying(Screen):
         self.add_component(LabelText('lbl_track_artist', self.surface, 0, 0, SCREEN_WIDTH, 18))
         self.components['lbl_track_artist'].set_alignment(HOR_LEFT, VERT_MID)
         self.components['lbl_track_artist'].background_alpha_set(160)
-        self.add_component(LabelText('lbl_track_title', self.surface, 0, SCREEN_HEIGHT - 26, SCREEN_WIDTH, 18))
+        self.add_component(LabelText('lbl_track_title', self.surface, 0, SCREEN_HEIGHT - 26, SCREEN_WIDTH, 26))
         self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_MID)
         self.components['lbl_track_title'].background_alpha_set(160)
         self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 3, SCREEN_WIDTH, 3))
