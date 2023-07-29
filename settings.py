@@ -41,7 +41,7 @@ if RUN_ON_RASPBERRY_PI:
 # Display settings
 pygame.init() 	# Pygame initialization
 #: The display dimensions, change this if you have a bigger touch screen.
-DISPLAY_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 480, 800
+DISPLAY_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 480
 PYGAME_EVENT_DELAY = 25
 
 if RUN_ON_RASPBERRY_PI:  # If started on Raspberry Pi
