@@ -42,17 +42,16 @@ class ScreenPlaying(Screen):
         # Player specific labels
         self.add_component(LabelText('lbl_track_artist', self.surface, 0, 0, SCREEN_WIDTH, 18))
         self.components['lbl_track_artist'].set_alignment(HOR_LEFT, VERT_MID)
-        self.components['lbl_track_artist'].background_alpha_set(160)
-        self.add_component(LabelText('lbl_track_title', self.surface, 0, SCREEN_HEIGHT - 26, SCREEN_WIDTH, 26))
-        self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_MID)
+        self.add_component(LabelText('lbl_track_title', self.surface, 0, SCREEN_HEIGHT - 42, SCREEN_WIDTH, 42))
+        self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_TOP)
         self.components['lbl_track_title'].background_alpha_set(160)
-        self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 3, SCREEN_WIDTH, 3))
+        self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10))
         self.coverart_color = 0
 
     def show(self):
         """ Displays the screen. """
         self.components['pic_cover_art'].picture_set(mpd.now_playing.get_cover_art())
-        self.components['lbl_track_title'].text_set(mpd.now_playing.title + ' - ' + mpd.now_playing.artist)
+        self.components['lbl_track_title'].text_set(mpd.now_playing.artist + ' - ' + mpd.now_playing.title)
         self.components['lbl_track_artist'].text_set(mpd.now_playing.artist)
         # self.components['lbl_track_artist'].visible = True
         self.apply_color_theme()
@@ -84,10 +83,8 @@ class ScreenPlaying(Screen):
         if tag_name == 'pic_cover_art':
             if mpd.player_control_get() == 'play':
                 mpd.player_control_set('pause')
-                self.components['lbl_track_artist'].visible = True
             else:
                 mpd.player_control_set('play')
-                self.components['lbl_track_artist'].visible = False
         return 0
 
     def draw_cover_art(self):
