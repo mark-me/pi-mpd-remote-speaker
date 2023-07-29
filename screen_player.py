@@ -37,13 +37,13 @@ class ScreenPlaying(Screen):
         # Cover art
         # self.draw_cover_art()
         self.add_component(Picture('pic_cover_art',
-                                   self.surface, 80, 0, 240, 240,
+                                   self.surface, (SCREEN_WIDTH/2)-(SCREEN_HEIGHT/2), 0, SCREEN_HEIGHT, SCREEN_HEIGHT,
                                    "default_cover_art.png"))
         # Player specific labels
         self.add_component(LabelText('lbl_track_artist', self.surface, 0, 0, SCREEN_WIDTH, 18))
         self.components['lbl_track_artist'].set_alignment(HOR_LEFT, VERT_MID)
         self.components['lbl_track_artist'].background_alpha_set(160)
-        self.add_component(LabelText('lbl_track_title', self.surface, 0, SCREEN_HEIGHT - 20, SCREEN_WIDTH, 18))
+        self.add_component(LabelText('lbl_track_title', self.surface, 0, SCREEN_HEIGHT - 26, SCREEN_WIDTH, 18))
         self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_MID)
         self.components['lbl_track_title'].background_alpha_set(160)
         self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 3, SCREEN_WIDTH, 3))
