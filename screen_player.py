@@ -49,7 +49,7 @@ class ScreenPlaying(Screen):
     def show(self):
         """ Displays the screen. """
         self.components['pic_cover_art'].picture_set(mpd.now_playing.get_cover_art())
-        self.components['lbl_track_title'].text_set('  ' + mpd.now_playing.artist + ' - ' + mpd.now_playing.title)
+        self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.artist + ' - ' + mpd.now_playing.title)
         self.apply_color_theme()
         return super(ScreenPlaying, self).show()  # Draw screen
 
@@ -63,7 +63,7 @@ class ScreenPlaying(Screen):
                 if event == 'time_elapsed':
                     self.components['slide_time'].draw(playing.time_percentage)
                 if event == 'playing_file':
-                    self.components['lbl_track_title'].text_set('  ' + mpd.now_playing.title + ' - ' + mpd.now_playing.artist)
+                    self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + ' - ' + mpd.now_playing.artist)
                 if event == 'album_change':
                     file_img_cover = mpd.now_playing.get_cover_art()
                     self.components['pic_cover_art'].picture_set(file_img_cover)
