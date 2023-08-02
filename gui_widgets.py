@@ -27,6 +27,7 @@ from pygame.locals import *
 import math
 from settings import *
 from PIL import Image
+import numpy as np
 
 # Alignment variables
 HOR_LEFT = 0
@@ -248,28 +249,81 @@ class Picture(Widget):
     def picture_filename_get(self):
         return self.__image_file
 
+    def get_top_10(self, hex_list):
+        hex_frequency = {}
+
+        for item in hex_list:
+            if item in hex_frequency:
+                hex_frequency[item] += 1
+            else:
+                hex_frequency[item] = 1
+
+        sorted_hex = dict(sorted(hex_frequency.items(), key=lambda item: item[1]))
+
+        return list(sorted_hex.keys())[-10:][::-1]
+
+    def rgb_to_hex(self, r, g, b):
+        ans = ('{:X}{:X}{:X}').format(r, g, b)
+        while len(ans) < 6:
+            ans = "0" + ans
+        return "#" + ans
+
+    def hex_to_rgb(self, h):
+        rgb = []
+        for i in (0, 2, 4):
+            decimal = int(h[i:i + 2], 16)
+            rgb.append(decimal)
+
+        return tuple(rgb)
+
     def color_main(self, qty_colors=3):
 
         image = Image.open(self.__image_file)
         image = image.copy()
-        image = image.crop((0, 0, 20, 240))
+        image = image.resize((self.width, self.height))
+        image_array = np.array(image)
 
-        # Reduce to palette
-        #paletted = image.convert('P', palette=Image.ADAPTIVE, colors=qty_colors)
-        paletted = image.convert('P', palette=Image.ADAPTIVE)
+        x = image_array.shape[0]
+        y = image_array.shape[1]
 
-        # Find dominant colors
-        palette = paletted.getpalette()
-        color_counts = sorted(paletted.getcolors(), reverse=True)
-        qty_colors = min(qty_colors, len(color_counts))
-        colors = list()
-        for i in range(qty_colors):
-            palette_index = color_counts[i][1]
-            dominant_color = palette[palette_index * 3:palette_index * 3 + 3]
-            colors.append(tuple(dominant_color))
+        hex_list = []
+        for x in range(x):
+            for y in range(y):
+                rgb = image_array[x, y, :]
+                r = rgb[0]
+                g = rgb[1]
+                b = rgb[2]
+                hex_list.append(self.rgb_to_hex(r, g, b))
 
-        return colors
+        top_10_hex = self.get_top_10(hex_list)
+        top_10_rgb = [self.hex_to_rgb(i[-6:]) for i in top_10_hex]
 
+        return top_10_rgb
+
+    def color_bottom(self, qty_colors=3):
+
+        image = Image.open(self.__image_file)
+        image = image.copy()
+        image = image.resize((self.width, self.height))
+        image = image.crop((self.height-40, 0, self.height, 40))
+        image_array = np.array(image)
+
+        x = image_array.shape[0]
+        y = image_array.shape[1]
+
+        hex_list = []
+        for x in range(x):
+            for y in range(y):
+                rgb = image_array[x, y, :]
+                r = rgb[0]
+                g = rgb[1]
+                b = rgb[2]
+                hex_list.append(self.rgb_to_hex(r, g, b))
+
+        top_10_hex = self.get_top_10(hex_list)
+        top_10_rgb = [self.hex_to_rgb(i[-6:]) for i in top_10_hex]
+
+        return top_10_rgb
 
 class LabelText(Widget):
     """ LabelText is used to write text that needs to fit in a pre-defined rectangle.

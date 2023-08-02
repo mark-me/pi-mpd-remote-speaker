@@ -86,7 +86,7 @@ class ScreenPlaying(Screen):
         left_position = 40
         hor_length = SCREEN_WIDTH - 40
         top_position = 0
-        vert_length = SCREEN_HEIGHT  # - 5
+        vert_length = SCREEN_HEIGHT
         if hor_length > vert_length:
             cover_size = vert_length
         else:
@@ -100,9 +100,10 @@ class ScreenPlaying(Screen):
 
     def apply_color_theme(self):
         self.coverart_color = self.components['pic_cover_art'].color_main()
+        color_bottom = self.components['pic_cover_art'].color_bottom()
         self.color = self.coverart_color[0]
-        self.components['slide_time'].bottom_color = self.coverart_color[0]
-        color_complimentary = np.subtract((255, 255, 255), self.color)
+        self.components['slide_time'].bottom_color = color_bottom[0]
+        color_complimentary = np.subtract((255, 255, 255), color_bottom[0])
         luminance = (color_complimentary[0] * 0.2989 + color_complimentary[1] * 0.5870 + color_complimentary[2] * 0.1140) / 255
         if luminance < .5:
             color_font = (0, 0, 0)
@@ -112,7 +113,7 @@ class ScreenPlaying(Screen):
         self.components['slide_time'].background_alpha = 160
         self.components['slide_time'].progress_color = color_complimentary
         self.components['lbl_track_title'].font_color = color_font
-        self.components['lbl_track_title'].background_color = self.color
+        self.components['lbl_track_title'].background_color = color_bottom[0]
 
 
 class ScreenVolume(ScreenModal):
