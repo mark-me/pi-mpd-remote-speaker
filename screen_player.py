@@ -24,6 +24,7 @@ import pygame
 from gui_screens import *
 from mpd_client import *
 from settings import *
+from PIL import Image, ImageFilter
 import numpy as np
 logging.info("ScreenPlaying definition")
 
@@ -36,15 +37,27 @@ class ScreenPlaying(Screen):
         Screen.__init__(self, screen_surface)
         # Cover art
         # self.draw_cover_art()
+        self.file_img_cover = 'default_cover_art.png'
+        self.coverart_color = 0
+        self.create_background()
+        self.add_component(Picture('pic_background',
+                                   self.surface, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+                                   'background.png'))
         self.add_component(Picture('pic_cover_art',
                                    self.surface, (SCREEN_WIDTH/2)-(SCREEN_HEIGHT/2), 0, SCREEN_HEIGHT, SCREEN_HEIGHT,
-                                   "default_cover_art.png"))
+                                   self.file_img_cover))
         # Player specific labels
         self.add_component(LabelText('lbl_track_title', self.surface, 0, SCREEN_HEIGHT - 42, SCREEN_WIDTH, 42))
         self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_TOP)
         self.components['lbl_track_title'].background_alpha_set(180)
         self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10))
-        self.coverart_color = 0
+
+    def create_background(self):
+        image = Image.open(self.file_img_cover)
+        image = image.resize((SCREEN_WIDTH, SCREEN_WIDTH))
+        image = image.crop((0, (SCREEN_WIDTH - SCREEN_HEIGHT)/2, SCREEN_WIDTH, SCREEN_WIDTH - (SCREEN_WIDTH - SCREEN_HEIGHT)/2))
+        image = image.filter(ImageFilter.GaussianBlur(8))
+        image.save('background.png')
 
     def show(self):
         """ Displays the screen. """
@@ -65,8 +78,10 @@ class ScreenPlaying(Screen):
                 if event == 'playing_file':
                     self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + ' - ' + mpd.now_playing.artist)
                 if event == 'album_change':
-                    file_img_cover = mpd.now_playing.get_cover_art()
-                    self.components['pic_cover_art'].picture_set(file_img_cover)
+                    self.file_img_cover = mpd.now_playing.get_cover_art()
+                    self.create_background()
+                    self.components['pic_cover_art'].picture_set(self.file_img_cover)
+                    self.components['pic_background'].picture_set('background.png')
                     self.apply_color_theme()
                 if event == 'album_change' or event == 'playing_file':
                     super(ScreenPlaying, self).show()
@@ -92,11 +107,11 @@ class ScreenPlaying(Screen):
         else:
             cover_size = hor_length
 
-        file_img_cover = mpd.now_playing.get_cover_art()
+        self.file_img_cover = mpd.now_playing.get_cover_art()
 
         self.add_component(Picture('pic_cover_art',
                                    self.surface, left_position, top_position, cover_size, cover_size,
-                                   file_img_cover))
+                                   self.file_img_cover))
 
     def apply_color_theme(self):
         self.coverart_color = self.components['pic_cover_art'].color_main()

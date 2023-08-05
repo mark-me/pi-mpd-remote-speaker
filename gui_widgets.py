@@ -251,8 +251,7 @@ class Picture(Widget):
     def color_main(self, qty_colors=3):
 
         image = Image.open(self.__image_file)
-        image = image.copy()
-        image = image.crop((0, 0, 20, 240))
+        image = image.crop((0, self.height - 30, self.width, self.height))
 
         # Reduce to palette
         #paletted = image.convert('P', palette=Image.ADAPTIVE, colors=qty_colors)
