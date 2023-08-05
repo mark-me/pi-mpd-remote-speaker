@@ -1,6 +1,6 @@
 # pi-mpd-touchscreen
 
-A Raspberry Pi view on what is being played by a MPD server. Used in combination with [snapcast|https://github.com/badaix/snapcast] to create as a remote speaker system. The name of the project currently is misleading, since I've stripped the project from all touchscreen interactions.
+A Raspberry Pi view on what is being played by a MPD server. Used in combination with [snapcast](https://github.com/badaix/snapcast) to create as a remote speaker system. The name of the project currently is misleading, since I've stripped the project from all touchscreen interactions.
 
 ## Install OH-MY-ZSH
 
