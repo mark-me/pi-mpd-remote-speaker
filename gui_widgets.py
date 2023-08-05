@@ -28,6 +28,9 @@ import math
 from settings import *
 from PIL import Image
 import numpy as np
+from sklearn.cluster import KMeans
+import cv2
+import colorsys
 
 # Alignment variables
 HOR_LEFT = 0
@@ -324,6 +327,60 @@ class Picture(Widget):
         top_10_rgb = [self.hex_to_rgb(i[-6:]) for i in top_10_hex]
 
         return top_10_rgb
+
+    def convert_rgb_hsv(self, image):
+        image = cv2.imread(self.__image_file)
+        image = cv2.resize(image, (self.height, self.width))
+        cv2.imshow('Read image', image)
+
+        hsv_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+        rgb_image = np.empty([image.shape[0], image.shape[1], 3])
+        for x in range(hsv_image.shape[0]):
+            for y in range(hsv_image.shape[1]):
+                color = hsv_image[x][y]
+                h, s, v = color
+                rbg = list(colorsys.hsv_to_rgb(h/255, s/255, v/255))
+                rgb = [rbg[0] * 255, rbg[2] * 255, rbg[1] * 255]
+                rgb_image[x, y]= rgb
+        rgb_image = rgb_image.astype(np.uint8)
+        cv2.imwrite('test.jpg', rgb_image)
+        cv2.imshow('Converted image', rgb_image)
+
+    def clustering(self, matrix_hsv):
+        for k in range(5, 13):
+            kmeans = KMeans(n_clusters=k, n_init=10)
+            kmeans.fit(matrix_hsv)
+            print(kmeans.inertia_)
+        return kmeans
+
+
+    def color_clusters(self, qty_clusters=5):
+        # Read image to HSV matrix
+        image = cv2.imread(self.__image_file)
+        #self.convert_rgb_hsv(image)
+        image = cv2.resize(image, (self.height, self.width))
+        cv2.imshow('Read image', image)
+        #image = image.crop((self.height-40, 0, self.height, self.width))
+        hsv_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+        hsv_matrix = np.array(hsv_image, dtype=np.float32)
+        hsv_matrix = hsv_matrix.reshape(hsv_matrix.shape[0] * hsv_matrix.shape[1], 3)
+
+        # Clustering colors
+        kmeans = self.clustering(hsv_matrix)
+        cluster_labels = kmeans.fit_predict(hsv_matrix)
+        labels, count = np.unique(cluster_labels, return_counts=True)
+        centroids = kmeans.cluster_centers_
+
+        # Convert HSV to RGB
+        rgb_centroids = [[] for i in range(qty_clusters)]
+        for i in range(qty_clusters):
+            h, s, v = centroids[i]
+            centroid_rbg = list(colorsys.hsv_to_rgb(h/255, s/255, v/255))
+            centroid_rgb = [centroid_rbg[0] * 255, centroid_rbg[2] * 255, centroid_rbg[1] * 255]
+            rgb_centroids[i] = centroid_rgb
+
+        rgb_sorted = [x for _,x in sorted(zip(count,rgb_centroids))]
+        return rgb_sorted
 
 class LabelText(Widget):
     """ LabelText is used to write text that needs to fit in a pre-defined rectangle.
