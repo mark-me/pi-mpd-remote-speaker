@@ -24,7 +24,7 @@ import pygame
 from gui_screens import *
 from mpd_client import *
 from settings import *
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageEnhance
 import numpy as np
 logging.info("ScreenPlaying definition")
 
@@ -57,6 +57,7 @@ class ScreenPlaying(Screen):
         image = image.resize((SCREEN_WIDTH, SCREEN_WIDTH))
         image = image.crop((0, (SCREEN_WIDTH - SCREEN_HEIGHT)/2, SCREEN_WIDTH, SCREEN_WIDTH - (SCREEN_WIDTH - SCREEN_HEIGHT)/2))
         image = image.filter(ImageFilter.GaussianBlur(8))
+        image = ImageEnhance.Brightness(image).enhance(0.6)
         image.save('background.png')
 
     def show(self):
