@@ -1,8 +1,6 @@
 import pyaudio
-from scipy import signal
 import numpy as np
 import struct
-import math
 
 import pygame
 
@@ -11,14 +9,11 @@ INPUT_BLOCK_TIME = 0.005 # 30 ms
 INPUT_FRAMES_PER_BLOCK = int(INPUT_SOUND_RATE * INPUT_BLOCK_TIME)
 INPUT_DEVICE_INDEX = 6
 
-def get_rms(block):
-    return np.sqrt(np.mean(np.square(block)))
-
-class AudioHandler(object):
+class AudioSpectrometer(object):
     def __init__(self):
+        self.idx_input_device = INPUT_DEVICE_INDEX
         self.pa = pyaudio.PyAudio()
         self.stream = self.open_sound_stream()
-        self.idx_input_device = INPUT_DEVICE_INDEX
 
     def stop(self):
         self.stream.close()
@@ -52,10 +47,8 @@ class AudioHandler(object):
 
         return stream
 
-    def processBlock(self, snd_block):
-        f, t, Sxx = signal.spectrogram(snd_block, RATE)
-        dBS = 10 * np.log10(Sxx)
-        return dBS
+    def get_rms(self, block):
+        return np.sqrt(np.mean(np.square(block)))
 
     def listen(self):
         amplitude=0
@@ -63,14 +56,14 @@ class AudioHandler(object):
             raw_block = self.stream.read(INPUT_FRAMES_PER_BLOCK, exception_on_overflow = False)
             format = '%dh' % (len(raw_block) / 2)
             snd_block = np.array(struct.unpack(format, raw_block))
-            amplitude = get_rms(snd_block)
+            amplitude = self.get_rms(snd_block)
         except Exception as e:
             print('Error recording: {}'.format(e))
         return amplitude
 
 if __name__ == '__main__':
     pygame.init()
-    audio = AudioHandler()
+    audio = AudioSpectrometer()
     screen = pygame.display.set_mode([800, 480])
     image = pygame.image.load('background.png')
 
