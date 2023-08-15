@@ -31,6 +31,12 @@ import os
 os.environ['SDL_AUDIODRIVER'] = 'dsp'
 import pygame
 
+# Sound spectrometer settings
+INPUT_DEVICE_INDEX = 6
+INPUT_SOUND_RATE = 10000 # 44100
+INPUT_BLOCK_TIME = 0.005 # 30 ms
+INPUT_FRAMES_PER_BLOCK = int(INPUT_SOUND_RATE * INPUT_BLOCK_TIME)
+
 #: Switches between development/debugging on your desktop/laptop versus running on your Raspberry Pi
 RUN_ON_RASPBERRY_PI = os.uname()[4] == 'aarch64'
 

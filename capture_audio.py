@@ -4,10 +4,12 @@ import numpy as np
 import struct
 import math
 
-THRESHOLD = 40 # dB
-RATE = 44100
-INPUT_BLOCK_TIME = 0.03 # 30 ms
-INPUT_FRAMES_PER_BLOCK = int(RATE * INPUT_BLOCK_TIME)
+import pygame
+
+INPUT_SOUND_RATE = 10000 #44100
+INPUT_BLOCK_TIME = 0.005 # 30 ms
+INPUT_FRAMES_PER_BLOCK = int(INPUT_SOUND_RATE * INPUT_BLOCK_TIME)
+INPUT_DEVICE_INDEX = 6
 
 def get_rms(block):
     return np.sqrt(np.mean(np.square(block)))
@@ -15,9 +17,8 @@ def get_rms(block):
 class AudioHandler(object):
     def __init__(self):
         self.pa = pyaudio.PyAudio()
-        self.stream = self.open_mic_stream()
-        self.threshold = THRESHOLD
-        self.plot_counter = 0
+        self.stream = self.open_sound_stream()
+        self.idx_input_device = INPUT_DEVICE_INDEX
 
     def stop(self):
         self.stream.close()
@@ -39,39 +40,57 @@ class AudioHandler(object):
 
         return device_index
 
-    def open_mic_stream( self ):
+    def open_sound_stream( self ):
         device_index = self.find_input_device()
 
         stream = self.pa.open(  format = pyaudio.paInt16,
                                 channels = 1,
-                                rate = RATE,
+                                rate = INPUT_SOUND_RATE,
                                 input = True,
-                                input_device_index = 0,
+                                input_device_index = self.idx_input_device,
                                 frames_per_buffer = INPUT_FRAMES_PER_BLOCK)
 
         return stream
 
     def processBlock(self, snd_block):
         f, t, Sxx = signal.spectrogram(snd_block, RATE)
-        print('Freq: ' + f + "  - t: " + t + '  - Sxx: ' + Sxx)
+        dBS = 10 * np.log10(Sxx)
+        return dBS
 
     def listen(self):
+        amplitude=0
         try:
             raw_block = self.stream.read(INPUT_FRAMES_PER_BLOCK, exception_on_overflow = False)
-            count = len(raw_block) / 2
-            format = '%dh' % (count)
+            format = '%dh' % (len(raw_block) / 2)
             snd_block = np.array(struct.unpack(format, raw_block))
+            amplitude = get_rms(snd_block)
         except Exception as e:
             print('Error recording: {}'.format(e))
-            return
-
-        amplitude = get_rms(snd_block)
-        if amplitude > self.threshold:
-            self.processBlock(snd_block)
-        else:
-            pass
+        return amplitude
 
 if __name__ == '__main__':
+    pygame.init()
     audio = AudioHandler()
-    for i in range(0,100):
-        audio.listen()
+    screen = pygame.display.set_mode([800, 480])
+    image = pygame.image.load('background.png')
+
+    running = True
+    while running:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        amplitude = audio.listen()
+
+        screen.fill((255, 255, 255))
+        #print(amplitude / 1000)
+        x_size = 800 + amplitude / 700
+        y_size = 480 + amplitude / 700
+        x_pos = y_pos = - (amplitude / 1000)/2
+
+        scaled_image = pygame.transform.smoothscale(image, (x_size, y_size))
+        screen.blit(scaled_image, (x_pos, x_pos))
+        # pygame.draw.circle(screen, (0, 0, 255), (amplitude/100, amplitude/100), amplitude/100)
+        pygame.display.flip()
+    pygame.quit()
