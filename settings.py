@@ -35,7 +35,6 @@ import pygame
 INPUT_DEVICE_INDEX = 6
 INPUT_SOUND_RATE = 10000 # 44100
 INPUT_BLOCK_TIME = 0.005 # 30 ms
-INPUT_FRAMES_PER_BLOCK = int(INPUT_SOUND_RATE * INPUT_BLOCK_TIME)
 
 #: Switches between development/debugging on your desktop/laptop versus running on your Raspberry Pi
 RUN_ON_RASPBERRY_PI = os.uname()[4] == 'aarch64'
@@ -43,12 +42,13 @@ RUN_ON_RASPBERRY_PI = os.uname()[4] == 'aarch64'
 # Setting up touch screen, set if statement to true on Raspberry Pi
 if RUN_ON_RASPBERRY_PI:
     os.environ['SDL_FBDEV'] = '/dev/fb1'
+    INPUT_DEVICE_INDEX = 0
 
 # Display settings
 pygame.init() 	# Pygame initialization
 #: The display dimensions, change this if you have a bigger touch screen.
 DISPLAY_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 480
-PYGAME_EVENT_DELAY = 25
+PYGAME_EVENT_DELAY = 0 #25
 
 if RUN_ON_RASPBERRY_PI:  # If started on Raspberry Pi
     display_flags = pygame.FULLSCREEN  # Turn on video acceleration

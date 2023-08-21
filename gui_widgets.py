@@ -48,15 +48,16 @@ class Widget(object):
         :param height: The height of the widget's rectangle
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height):
+    def __init__(self, tag_name, screen, x, y, width, height):
         self.tag_name = tag_name
         self.visible = True
-        self.surface = surface
+        self.screen = screen
+        self.surface = pygame.Surface((width, height))
         self.x_pos = x
         self.y_pos = y
         self.width = width
         self.height = height
-        self.rect = Rect(x, y, width, height)
+        # self.rect = Rect(x, y, width, height)
         self.outline_visible = False
         self.outline_color = WHITE
         self.background_color = BLACK
@@ -73,12 +74,13 @@ class Widget(object):
         self.font = pygame.font.Font(font_name, font_size)
         self.font_color = font_color
 
-    def position_set(self, x, y, width, height):
+    def position_size_set(self, x, y, width, height):
         self.x_pos = x
         self.y_pos = y
         self.width = width
         self.height = height
-        self.rect = Rect(x, y, width, height)
+        self.surface = pygame.transform.smoothscale(self.surface, (self.width, self.height))
+        self.screen.blit(self.surface, (0, 0))
 
 
 class Rectangle(Widget):
@@ -92,14 +94,14 @@ class Rectangle(Widget):
         :param height: The height of the rectangle's rectangle
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height):
-        Widget.__init__(self, tag_name, surface, x, y, width, height)
+    def __init__(self, tag_name, screen, x, y, width, height):
+        Widget.__init__(self, tag_name, screen, x, y, width, height)
         self.background_color = BLACK
 
     def draw(self):
         """ Draws the label. """
-        self.surface.fill(self.background_color, self.rect)  # Background
-        pygame.display.update(self.rect)
+        self.surface.fill(self.background_color)
+        self.screen.blit(self.surface, (self.x_pos, self.y_pos))
 
 
 class Slider(Rectangle):
@@ -113,8 +115,8 @@ class Slider(Rectangle):
         :param height: The height of the slider's rectangle
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height):
-        Rectangle.__init__(self, tag_name, surface, x, y, width, height)
+    def __init__(self, tag_name, screen, x, y, width, height):
+        Rectangle.__init__(self, tag_name, screen, x, y, width, height)
         self.progress_color = GREEN
         self.progress_percentage = 0
         self.progress_rect = Rect(x + 1, y + 1, 1, height - 2)
@@ -123,11 +125,9 @@ class Slider(Rectangle):
     def draw(self, percentage=None):
         if percentage is not None:
             self.progress_percentage_set(percentage)
-        self.surface.fill(self.background_color, self.rect)  # Background
-        pygame.display.update(self.rect)
+        self.surface.fill(self.background_color)
         if self.progress_percentage > 0:
-            self.surface.fill(self.progress_color, self.progress_rect)  # Progress bar
-            pygame.display.update(self.progress_rect)
+            pygame.draw.rect(self.surface, self.progress_color, pygame.Rect(0, 0, 1, self.height))  # Progress bar
 
     def progress_percentage_set(self, percentage):
         """ Sets the slider's percentage 'full'.
@@ -167,27 +167,26 @@ class Slider2(Widget):
 
     def __init__(self, tag_name, surface, x, y, width, height):
         Widget.__init__(self, tag_name, surface, x, y, width, height)
-        self.bottom_color = BLACK
-        self.bottom_rect = (x, y + height, width, 1)
+        self.background_color = BLACK
         self.background_alpha = 160
-        self.background = pygame.Surface((self.width, self.height))
+        self.background_surface = pygame.Surface((self.width, self.height))
 
         self.progress_color = CREAM
         self.progress_percentage = 0
-        self.progress_rect = Rect(x, y, 1, height)
+        self.progress_rect = Rect(self.x_pos, self.y_pos, 1, self.height)
         self.caption_visible = False
 
     def draw(self, percentage=None):
-
-        self.background.fill(self.bottom_color)
-        self.background.set_alpha(self.background_alpha)
-        SCREEN.blit(self.background, (self.x_pos, self.y_pos))
-
+        self.surface.fill(Color(0,0,0,0))
+        self.surface.fill(self.background_color)
+        self.surface.set_alpha(self.background_alpha)
+        # self.surface.blit(self.background_surface, (0, 0))
         if percentage is not None:
             self.progress_percentage_set(percentage)
         if self.progress_percentage > 0:
-            self.surface.fill(self.progress_color, self.progress_rect)  # Progress bar
-        pygame.display.update(self.rect)
+            i = self.progress_surface.get_width()
+            self.surface.blit(self.progress_surface, (0, 0))
+        self.screen.blit(self.surface, (self.x_pos, self.y_pos))
 
     def progress_percentage_set(self, percentage):
         """ Sets the slider's percentage 'full'.
@@ -202,7 +201,8 @@ class Slider2(Widget):
             width = 1
         else:
             width = self.width * (float(percentage) / 100)
-        self.progress_rect = Rect(self.x_pos, self.y_pos, width, self.height)
+        self.progress_surface = pygame.Surface((width, self.height))
+        self.progress_surface.fill(self.progress_color)
         self.progress_percentage = percentage
         self.draw()
 
@@ -227,15 +227,12 @@ class Picture(Widget):
 
     def __init__(self, tag_name, surface, x, y, width, height, image_file=""):
         Widget.__init__(self, tag_name, surface, x, y, width, height)
-        self.__image_file = image_file
-        self.__image = pygame.image.load(image_file)
-        self.__image = pygame.transform.scale(self.__image, (self.width, self.height))
+        self.picture_set(image_file)
 
     def draw(self):
-        self.__image = pygame.image.load(self.__image_file)
-        self.__image = pygame.transform.smoothscale(self.__image, (self.width, self.height))
-        SCREEN.blit(self.__image, (self.x_pos, self.y_pos))
-        pygame.display.update(self.rect)
+        self.surface.fill((0, 0, 0))
+        self.surface.blit(self.__image, (0, 0))
+        self.screen.blit(self.surface, (self.x_pos, self.y_pos))
 
     def on_click(self, x, y):
         return self.tag_name
@@ -243,20 +240,28 @@ class Picture(Widget):
     def picture_set(self, file_name):
         """ Sets the filename of the picture. """
         self.__image_file = file_name
+        self.__image = pygame.image.load(file_name)
+        self.__image = pygame.transform.smoothscale(self.__image, (self.width, self.height))
         self.draw()
 
     def picture_filename_get(self):
         return self.__image_file
 
-    def color_main(self, qty_colors=3):
+    def position_size_set(self, x, y, width, height):
+        self.x_pos = x
+        self.y_pos = y
+        self.width = width
+        self.height = height
+        self.surface = pygame.transform.smoothscale(self.surface, (self.width, self.height))
 
+        self.screen.blit(self.surface, (0, 0))
+
+    def color_main(self, qty_colors=3):
         image = Image.open(self.__image_file)
         image = image.crop((0, self.height - 30, self.width, self.height))
-
         # Reduce to palette
         #paletted = image.convert('P', palette=Image.ADAPTIVE, colors=qty_colors)
         paletted = image.convert('P', palette=Image.ADAPTIVE)
-
         # Find dominant colors
         palette = paletted.getpalette()
         color_counts = sorted(paletted.getcolors(), reverse=True)
@@ -266,7 +271,6 @@ class Picture(Widget):
             palette_index = color_counts[i][1]
             dominant_color = palette[palette_index * 3:palette_index * 3 + 3]
             colors.append(tuple(dominant_color))
-
         return colors
 
 
@@ -289,7 +293,6 @@ class LabelText(Widget):
         self.alignment_vertical = VERT_MID
         self.indent_horizontal = 0
         self.indent_vertical = 0
-        self.outline_show = False
         self.outline_color = BLACK
         self.background_alpha = 255
 
@@ -329,39 +332,34 @@ class LabelText(Widget):
             :return: Text that couldn't be fitted inside the label's rectangle,
         """
         # Draw background
-        background = pygame.Surface((self.width, self.height))
-        background.set_alpha(self.background_alpha)
-        background.fill(self.background_color)
-        SCREEN.blit(background, (self.x_pos, self.y_pos))
-        # Draw outline
-        if self.outline_show:
-            pygame.draw.rect(self.surface, self.outline_color, self.rect, 1)
+        self.surface.set_alpha(self.background_alpha)
+        self.surface.fill(self.background_color)
         # Determining caption width and height
+        surface_rect = self.surface.get_rect()
         i = 1
-        while self.font.size(self.caption[:i])[0] < self.rect.width and i < len(
+        while self.font.size(self.caption[:i])[0] < surface_rect.width and i < len(
                 self.caption):  # Determine maximum width of line
             i += 1
         caption_width = self.font.size(self.caption[:i])[0]
         caption_height = self.font.size(self.caption[:i])[1]
         # Horizontal alignment
         if self.alignment_horizontal == HOR_LEFT:
-            x = self.rect.left + self.indent_horizontal
+            x = surface_rect.left + self.indent_horizontal
         elif self.alignment_horizontal == HOR_MID:
-            x = self.rect.centerx + self.indent_horizontal - caption_width / 2
+            x = surface_rect.centerx + self.indent_horizontal - caption_width / 2
         elif self.alignment_horizontal == HOR_RIGHT:
-            x = self.rect.right - self.indent_horizontal - caption_width
+            x = surface_rect.right - self.indent_horizontal - caption_width
         # Vertical alignment
         if self.alignment_vertical == VERT_TOP:
-            y = self.rect.top + self.indent_vertical
+            y = surface_rect.top + self.indent_vertical
         elif self.alignment_vertical == VERT_MID:
-            y = self.rect.centery + self.indent_vertical - caption_height / 2
+            y = surface_rect.centery + self.indent_vertical - caption_height / 2
         elif self.alignment_vertical == VERT_BOTTOM:
-            y = self.rect.bottom - self.indent_vertical - caption_height
+            y = surface_rect.bottom - self.indent_vertical - caption_height
         # Draw Caption
         image = FONT.render(self.caption[:i], True, self.font_color)
         self.surface.blit(image, (x, y))
-        pygame.display.update(self.rect)
-
+        self.screen.blit(self.surface, (self.x_pos, self.y_pos))
         return self.caption[i:]
 
 
@@ -394,10 +392,10 @@ class Memo(Widget):
         background = pygame.Surface((self.width, self.height))
         background.set_alpha(self.background_alpha)
         background.fill(self.background_color)
-        SCREEN.blit(background, (self.x_pos, self.y_pos))
+        self.screen.blit(background, (self.x_pos, self.y_pos))
         # Draw outline
         if self.outline_show:
-            pygame.draw.rect(self.surface, self.outline_color, self.rect, 1)
+            pygame.draw.rect(self.screen, self.outline_color, self.rect, 1)
         # Draw text lines
         self.__wrap_caption()
         line_height = self.font.size("jP")[1]
@@ -405,11 +403,10 @@ class Memo(Widget):
         line_no = 0
         for line in self.__caption_lines:
             image = FONT.render(line, True, self.font_color)
-            self.surface.blit(image, (self.x_pos, self.y_pos + (line_no * line_height)))
+            self.screen.blit(image, (self.x_pos, self.y_pos + (line_no * line_height)))
             line_no += 1
             if line_no > max_lines:
                 break
-        pygame.display.update(self.rect)
 
     def transparent_set(self, value):
         """ Turns background transparent or opaque. """
@@ -474,7 +471,7 @@ class ButtonIcon(Widget):
         if icon_file is not None:
             self.image_file = icon_file
             self.__icon = pygame.image.load(self.image_file)
-        self.rect = self.surface.blit(self.__icon, (self.x_pos, self.y_pos))
+        self.rect = self.screen.blit(self.__icon, (self.x_pos, self.y_pos))
         pygame.display.update(self.rect)
 
     def icon_file_set(self, icon_file):
@@ -523,7 +520,7 @@ class ButtonText(LabelText):
         self.alignment_horizontal = HOR_MID
 
     def draw(self, text=None):
-        self.surface.fill(self.button_color, self.button_rect)  # Background
+        self.screen.fill(self.button_color, self.button_rect)  # Background
         if text is not None:
             self.caption = text
         super(ButtonText, self).draw()
@@ -563,16 +560,16 @@ class Switch(Widget):
         return self.__is_on
 
     def on_click(self, x, y):
-        self.surface.fill(self.background_color, self.rect)
+        self.screen.fill(self.background_color, self.rect)
         self.__is_on = not self.__is_on
         self.draw()
         return self.tag_name
 
     def draw(self):
         if self.__is_on:
-            rect = self.surface.blit(self.__icon_on, (self.x_pos, self.y_pos))
+            rect = self.screen.blit(self.__icon_on, (self.x_pos, self.y_pos))
         else:
-            rect = self.surface.blit(self.__icon_off, (self.x_pos, self.y_pos))
+            rect = self.screen.blit(self.__icon_off, (self.x_pos, self.y_pos))
         pygame.display.update(rect)
 
 
@@ -633,9 +630,9 @@ class ItemList(Widget):
 
     def draw(self):
         """ Draws the item list on screen. """
-        self.surface.fill(self.background_color, self.rect)
+        self.screen.fill(self.background_color, self.rect)
         if self.outline_visible:
-            pygame.draw.rect(self.surface, self.outline_color, self.rect, 1)
+            pygame.draw.rect(self.screen, self.outline_color, self.rect, 1)
         pygame.display.update(self.rect)
         self.draw_items()
         self.draw_page_indicator()
@@ -649,7 +646,7 @@ class ItemList(Widget):
             indicator_x = self.x_pos + self.width - indicator_width
             indicator_y = self.y_pos + self.page_showing_index * indicator_height
             indicator = Rect(indicator_x, indicator_y, indicator_width, indicator_height)
-            pygame.draw.rect(self.surface, CREAM, indicator)
+            pygame.draw.rect(self.screen, CREAM, indicator)
 
     def draw_items(self):
         """ Draws the list items. """
@@ -664,7 +661,7 @@ class ItemList(Widget):
             item_x_pos = self.x_pos + self.item_indent                                  # x position of item
             item_width = self.width - 2 * self.item_indent - 10  # Maximum item width
             item_y_pos = self.y_pos + self.item_indent + (self.item_height * item_nr)   # y position of item
-            list_item = LabelText('lbl_item_' + str(item_nr), self.surface, item_x_pos, item_y_pos, item_width,
+            list_item = LabelText('lbl_item_' + str(item_nr), self.screen, item_x_pos, item_y_pos, item_width,
                                   self.item_height, item_text)  # Create label
             list_item.font_color = self.font_color
             list_item.outline_visible = self.item_outline_visible
@@ -767,7 +764,7 @@ class WidgetContainer(Widget):
 
     def draw(self):
         """ Displays the screen. """
-        self.surface.fill(self.background_color, self.rect)  # Background
+        self.screen.fill(self.background_color, self.rect)  # Background
         for key, value in self.components.items():
             if value.visible:
                 value.draw()

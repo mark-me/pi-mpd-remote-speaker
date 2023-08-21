@@ -146,12 +146,12 @@ class ScreenControl(object):
             if self.current_index < len(self.screen_list):
                 self.current_index = self.screen_list[self.current_index].show()
 
-    def add_screen(self, screen, loop_hook_function=None):
+    def add_screen(self, screen, event_hook_function=None):
         """ Adds screen to list """
         self.screen_list.append(screen)
         added_index = len(self.screen_list) - 1
-        if loop_hook_function is not None:
-            self.screen_list[added_index].loop_hook = loop_hook_function
+        if event_hook_function is not None:
+            self.screen_list[added_index].hook_event = event_hook_function
 
 
 class Screen(object):
@@ -170,7 +170,7 @@ class Screen(object):
         elif isinstance(screen_or_surface, Screen):
             self.parent_screen = screen_or_surface
             self.surface = screen_or_surface.surface
-            self.loop_hook = self.parent_screen.loop_hook
+            self.hook_event = self.parent_screen.hook_event
         self.loop_active = True
 
         self.components = {}  # Interface dictionary
@@ -202,15 +202,14 @@ class Screen(object):
     def close(self):
         if self.parent_screen is not None:
             self.parent_screen.active = True
-            self.parent_screen.loop_hook = self.loop_hook
+            self.parent_screen.hook_event = self.hook_event
         self.loop_active = False
 
     def loop(self):
         """ Loops for events """
         while self.loop_active:
-
             pygame.time.wait(PYGAME_EVENT_DELAY)
-            if self.loop_hook():  # and now <= deadline:
+            if self.hook_event():  # and now <= deadline:
                 self.update()
             for event in pygame.event.get():  # Do for all events in pygame's event queue
                 if event.type == KEYDOWN:
@@ -233,7 +232,10 @@ class Screen(object):
             y = self.gesture_detect.y_start
             self.on_swipe(x, y, gesture)
 
-    def loop_hook(self):
+    def hook_event(self):
+        pass
+
+    def hook_realtime(self):
         pass
 
     def on_click(self, x, y):

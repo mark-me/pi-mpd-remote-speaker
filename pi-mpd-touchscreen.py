@@ -45,18 +45,17 @@ class PiJukeboxScreens(ScreenControl):
     def __init__(self):
         logging.info("Start screens")
         ScreenControl.__init__(self)
-
         self.timer = pygame.time.get_ticks
         self.blank_screen_time = self.timer() + BLANK_PERIOD
         # Screen with now playing and cover art
-        self.add_screen(ScreenPlaying(SCREEN), self.loop_hook)
-        self.add_screen(ScreenBlank(SCREEN), self.loop_hook)
+        self.add_screen(ScreenPlaying(SCREEN), self.hook_event)
+        self.add_screen(ScreenBlank(SCREEN), self.hook_event)
 
     def mpd_updates(self):
         """ Updates a current screen if it shows mpd relevant content. """
         self.screen_list[self.current_index].update()
 
-    def loop_hook(self):
+    def get_mpd_status(self):
         mpd_status = mpd.status_get()
         mpd_control_status = mpd.player_control_get()
         is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
@@ -68,8 +67,11 @@ class PiJukeboxScreens(ScreenControl):
         elif not is_playing and self.timer() > self.blank_screen_time and self.current_index != 1:
             self.current_index = 1
             self.show()
-
         return mpd_status
+
+    def hook_event(self):
+
+        return self.get_mpd_status()
 
     def update(self):
         pass
@@ -77,25 +79,20 @@ class PiJukeboxScreens(ScreenControl):
 
 def main():
     signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit())
-
     logging.info("Starting main")
     """ The function where it all starts...."""
     if "SSH_CONNECTION" in os.environ:
         print("Not starting pi-mpd-touchscreen, ssh session")
-
     pygame.display.set_caption("Pi Jukebox")
     # apply_settings()  # Check for first time settings and applies settings
-
     # Check whether mpd is running and get it's status
     if not mpd.connect():
         print("Couldn't connect to the mpd server " + mpd.host + " on port " + str(
             mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
         sys.exit()
-
     mpd.status_get()  # Get mpd status
     screens = PiJukeboxScreens()  # Screens
     screens.show()  # Display the screen
-
     pygame.init()
     sleep(0.2)
     pygame.display.update()

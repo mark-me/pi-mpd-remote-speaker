@@ -23,6 +23,7 @@ import pygame
 
 from gui_screens import *
 from mpd_client import *
+from capture_audio import *
 from settings import *
 from PIL import Image, ImageFilter, ImageEnhance
 import numpy as np
@@ -39,17 +40,19 @@ class ScreenPlaying(Screen):
         # self.draw_cover_art()
         self.file_img_cover = 'default_cover_art.png'
         self.coverart_color = 0
+        self.audio_spectrometer = AudioSpectrometer(idx_input_device=INPUT_DEVICE_INDEX,
+                                                    block_time=INPUT_BLOCK_TIME,
+                                                    sound_rate=INPUT_SOUND_RATE)
         self.create_background()
         self.add_component(Picture('pic_background',
                                    self.surface, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                                    'background.png'))
         self.add_component(Picture('pic_cover_art',
-                                   self.surface, (SCREEN_WIDTH/2)-(SCREEN_HEIGHT/2) + 15, 15, SCREEN_HEIGHT - 30, SCREEN_HEIGHT - 30,
+                                   self.surface, (SCREEN_WIDTH/2)-(SCREEN_HEIGHT/2) + 15, 15, SCREEN_HEIGHT - 40, SCREEN_HEIGHT - 40,
                                    self.file_img_cover))
-        # Player specific labels
-        self.add_component(LabelText('lbl_track_title', self.surface, 0, SCREEN_HEIGHT - 42, SCREEN_WIDTH, 42))
-        self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_TOP)
-        self.components['lbl_track_title'].background_alpha_set(180)
+        self.add_component(LabelText('lbl_track_title', self.surface, 0, 0, SCREEN_WIDTH, 38)) # SCREEN_HEIGHT - 42, SCREEN_WIDTH, 42))
+        self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_BOTTOM)
+        self.components['lbl_track_title'].background_alpha_set(130)
         self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10))
 
     def create_background(self):
@@ -65,7 +68,7 @@ class ScreenPlaying(Screen):
         self.components['pic_cover_art'].picture_set(mpd.now_playing.get_cover_art())
         self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.artist + ' - ' + mpd.now_playing.title)
         self.apply_color_theme()
-        return super(ScreenPlaying, self).show()  # Draw screen
+        return super(ScreenPlaying, self).show()
 
     def update(self):
         while True:
@@ -86,8 +89,18 @@ class ScreenPlaying(Screen):
                     self.apply_color_theme()
                 if event == 'album_change' or event == 'playing_file':
                     super(ScreenPlaying, self).show()
+                self.update_spectrometer()
+                super(ScreenPlaying, self).show()
+
             except IndexError:
                 break
+
+    def update_spectrometer(self):
+        amplitude = self.audio_spectrometer.listen()
+        x_size = 800 + amplitude / 700
+        y_size = 480 + amplitude / 700
+        x_pos = y_pos = - (amplitude / 700)/2
+        self.components['pic_background'].position_size_set(x=x_pos, y=y_pos, width=x_size, height=y_size)
 
     def on_click(self, x, y):
         tag_name = super(ScreenPlaying, self).on_click(x, y)
@@ -111,7 +124,7 @@ class ScreenPlaying(Screen):
         self.file_img_cover = mpd.now_playing.get_cover_art()
 
         self.add_component(Picture('pic_cover_art',
-                                   self.surface, left_position, top_position, cover_size, cover_size,
+                                   self.layer_foreground, left_position, top_position, cover_size, cover_size,
                                    self.file_img_cover))
 
     def apply_color_theme(self):
