@@ -1,25 +1,35 @@
-from multiprocessing import Value
-from multiprocessing import Process
+import multiprocessing
 from ctypes import c_wchar_p
 from mpd_client import *
+import sys
 
 
-def get_mpd_status(status):
-    mpd_status = mpd.status_get()
-    mpd_control_status = mpd.player_control_get()
-    is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
-    if is_playing:
-        print("Playing")
-    elif not is_playing:
-        print("Not playing")
-    status.value = mpd_status
+def get_mpd_status(lock, variable):
+    if lock.acquire(False):
+        print("I am in!")
+        mpd_status = mpd.status_get()
+        control_status = mpd.player_control_get()
+        is_playing = control_status != 'pause' and control_status != 'stop'
+        variable.value = control_status
+        if is_playing:
+            print("Playing")
+        elif not is_playing:
+            print("Not playing")
+        lock.release()
+        print("Gone out")
 
 if __name__ == "__main__":
-    mpd_status = Value(c_wchar_p, 'stop')
+    lock = multiprocessing.Lock()
+    mpd_status =  multiprocessing.Value(c_wchar_p, "None")
+    if not mpd.connect():
+        print("Couldn't connect to the mpd server " + mpd.host + " on port " + str(
+            mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
+        sys.exit()
+    i = 0
 
     while True:
-        process = Process(target=get_mpd_status, args=(mpd_status,))
         # start the process
+        process = multiprocessing.Process(target=get_mpd_status, args=(lock, mpd_status, ))
         process.start()
-        print(mpd_status.value)
-        print('test')
+        print('Main - Round: ' + str(i) + ' - ' + mpd_status.value )
+        i = i + 1

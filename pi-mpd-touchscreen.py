@@ -22,12 +22,16 @@ from screen_blank import *
 from screen_player import *
 from settings import *
 from mpd_client import *
+from capture_audio import *
 from time import sleep
+import asyncio
 import sys
 import signal
 __author__ = 'Mark Zwart'
 
 import logging
+
+getting_mpd_status = False
 
 logging.basicConfig(filename='pi-mpd-touchscreen.log',
                     format='%(asctime)s:%(levelname)s:%(message)s',
@@ -44,6 +48,9 @@ class PiJukeboxScreens(ScreenControl):
 
     def __init__(self):
         logging.info("Start screens")
+        self.audio_spectrometer = AudioSpectrometer(idx_input_device=INPUT_DEVICE_INDEX,
+                                                    block_time=INPUT_BLOCK_TIME,
+                                                    sound_rate=INPUT_SOUND_RATE)
         ScreenControl.__init__(self)
         self.timer = pygame.time.get_ticks
         self.blank_screen_time = self.timer() + BLANK_PERIOD
@@ -55,7 +62,7 @@ class PiJukeboxScreens(ScreenControl):
         """ Updates a current screen if it shows mpd relevant content. """
         self.screen_list[self.current_index].update()
 
-    def get_mpd_status(self):
+    async def get_mpd_status(self):
         mpd_status = mpd.status_get()
         mpd_control_status = mpd.player_control_get()
         is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
@@ -69,9 +76,15 @@ class PiJukeboxScreens(ScreenControl):
             self.show()
         return mpd_status
 
-    def hook_event(self):
+    async def get_amplitude(self):
+        amplitude = self.audio_spectrometer.listen()
+        return amplitude
 
-        return self.get_mpd_status()
+    async def hook_event(self):
+        if not getting_mpd_status:
+            mpd_task = asyncio.create_task(self.get_mpd_status())
+        mpd_status = await mpd_task
+        return mpd_status
 
     def update(self):
         pass
