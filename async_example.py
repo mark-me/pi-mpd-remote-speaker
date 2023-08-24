@@ -1,7 +1,8 @@
 import asyncio
+import sys
+
 from mpd_client import *
 from capture_audio import *
-import sys
 
 getting_mpd_status = False
 

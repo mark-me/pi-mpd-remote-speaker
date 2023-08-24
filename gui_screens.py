@@ -21,6 +21,7 @@ __author__ = 'Mark Zwart'
 # along with pi-jukebox. If not, see < http://www.gnu.org/licenses/ >.
 #
 # (C) 2015- by Mark Zwart, <mark.zwart@pobox.com>
+import asyncio
 
 from gui_widgets import *
 from settings import *
@@ -184,7 +185,7 @@ class Screen(object):
         """
         self.components[widget.tag_name] = widget
 
-    def show(self):
+    async def show(self):
         self.loop_active = True
         """ Displays the screen. """
         if self.parent_screen is not None:
@@ -194,7 +195,7 @@ class Screen(object):
             if value.visible:
                 value.draw()
         pygame.display.flip()
-        self.loop()
+        loop_task = asyncio.create_task(self.loop())
 
     def update(self):
         pass
@@ -205,11 +206,13 @@ class Screen(object):
             self.parent_screen.hook_event = self.hook_event
         self.loop_active = False
 
-    def loop(self):
+    async def loop(self):
         """ Loops for events """
         while self.loop_active:
             pygame.time.wait(PYGAME_EVENT_DELAY)
-            if self.hook_event():  # and now <= deadline:
+            event_task = asyncio.create_task(self.hook_event())
+            has_event = await event_task
+            if has_event:  # and now <= deadline:
                 self.update()
             for event in pygame.event.get():  # Do for all events in pygame's event queue
                 if event.type == KEYDOWN:
@@ -232,11 +235,8 @@ class Screen(object):
             y = self.gesture_detect.y_start
             self.on_swipe(x, y, gesture)
 
-    def hook_event(self):
-        pass
-
-    def hook_realtime(self):
-        pass
+    async def hook_event(self):
+        return False
 
     def on_click(self, x, y):
         """ Determines which component was clicked and fires its click function in turn
