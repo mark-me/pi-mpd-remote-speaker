@@ -185,7 +185,7 @@ class Screen(object):
         """
         self.components[widget.tag_name] = widget
 
-    async def show(self):
+    def show(self):
         self.loop_active = True
         """ Displays the screen. """
         if self.parent_screen is not None:
@@ -195,7 +195,15 @@ class Screen(object):
             if value.visible:
                 value.draw()
         pygame.display.flip()
-        loop_task = asyncio.create_task(self.loop())
+        self.loop()
+
+    def redraw(self):
+        self.surface.fill(self.color)
+        for key, value in self.components.items():
+            if value.visible:
+                value.draw()
+        pygame.display.flip()
+
 
     def update(self):
         pass
@@ -206,14 +214,11 @@ class Screen(object):
             self.parent_screen.hook_event = self.hook_event
         self.loop_active = False
 
-    async def loop(self):
+    def loop(self):
         """ Loops for events """
         while self.loop_active:
             pygame.time.wait(PYGAME_EVENT_DELAY)
-            event_task = asyncio.create_task(self.hook_event())
-            has_event = await event_task
-            if has_event:  # and now <= deadline:
-                self.update()
+            self.update()
             for event in pygame.event.get():  # Do for all events in pygame's event queue
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:

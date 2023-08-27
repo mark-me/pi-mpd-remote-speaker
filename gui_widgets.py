@@ -79,7 +79,7 @@ class Widget(object):
         self.y_pos = y
         self.width = width
         self.height = height
-        self.surface = pygame.transform.smoothscale(self.surface, (self.width, self.height))
+        self.surface = pygame.transform.smoothscale(self.surface, (width, width))
         self.screen.blit(self.surface, (0, 0))
 
 
@@ -240,7 +240,7 @@ class Picture(Widget):
     def picture_set(self, file_name):
         """ Sets the filename of the picture. """
         self.__image_file = file_name
-        self.__image = pygame.image.load(file_name)
+        self.__image = pygame.image.load(self.__image_file)
         self.__image = pygame.transform.smoothscale(self.__image, (self.width, self.height))
         self.draw()
 
@@ -248,13 +248,10 @@ class Picture(Widget):
         return self.__image_file
 
     def position_size_set(self, x, y, width, height):
-        self.x_pos = x
-        self.y_pos = y
-        self.width = width
-        self.height = height
-        self.surface = pygame.transform.smoothscale(self.surface, (self.width, self.height))
-
-        self.screen.blit(self.surface, (0, 0))
+        self.__image = pygame.image.load(self.__image_file)
+        self.__image = pygame.transform.scale(self.__image, (width, height))
+        self.__image = self.__image.subsurface(x, y, width -x, height-y)
+        self.draw()
 
     def color_main(self, qty_colors=3):
         image = Image.open(self.__image_file)

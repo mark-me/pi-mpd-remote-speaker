@@ -55,7 +55,6 @@ class AudioSpectrometer(object):
             amplitude = self.get_rms(snd_block)
         except Exception as e:
             print('Error recording: {}'.format(e))
-        print(amplitude)
         return amplitude
 
 if __name__ == '__main__':
