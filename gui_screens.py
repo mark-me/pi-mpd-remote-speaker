@@ -204,7 +204,6 @@ class Screen(object):
                 value.draw()
         pygame.display.flip()
 
-
     def update(self):
         pass
 
