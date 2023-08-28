@@ -172,7 +172,7 @@ class Slider2(Widget):
         self.background_surface = pygame.Surface((self.width, self.height))
         self.progress_color = CREAM
         self.progress_percentage = 0
-        self.progress_rect = Rect(self.x_pos, self.y_pos, 1, self.height)
+        self.progress_surface = pygame.Surface(( 1, self.height))
         self.caption_visible = False
 
     def draw(self, percentage=None):
@@ -181,7 +181,8 @@ class Slider2(Widget):
         if percentage is not None:
             self.progress_percentage_set(percentage)
         if self.progress_percentage > 0:
-            self.surface.fill(self.progress_color, self.progress_rect)
+            self.progress_surface.fill(self.progress_color)
+        self.surface.blit(self.progress_surface, (0, 0))
         self.screen.blit(self.surface, (self.x_pos, self.y_pos))
 
     def progress_percentage_set(self, percentage):
@@ -197,7 +198,7 @@ class Slider2(Widget):
             width = 1
         else:
             width = self.width * (float(percentage) / 100)
-        self.progress_rect = Rect(self.x_pos, self.y_pos, width, self.height)
+        self.progress_surface = pygame.Surface((width, self.height))
         self.progress_percentage = percentage
         self.draw()
 
