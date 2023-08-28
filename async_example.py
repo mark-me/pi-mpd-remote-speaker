@@ -53,14 +53,15 @@ class ScreenPlayer(Screen):
         return super(ScreenPlayer, self).show()
 
     def update(self):
-        #while True:
-        if not self.hook_event_running:
+        try:
             asyncio.run(self.hook_event())
+        except:
+            pass
         try:
             event = mpd.events.popleft()
             playing = mpd.now_playing
             if event == 'time_elapsed':
-                self.components['slide_time'].draw(playing.time_percentage)
+                self.components['slide_time'].progress_percentage_set(playing.time_percentage)
             if event == 'playing_file':
                 self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + ' - ' + mpd.now_playing.artist)
             if event == 'album_change':
@@ -117,15 +118,18 @@ class ScreenPlayer(Screen):
 
     async def hook_event(self):
         self.hook_event_running = True
-        mpd_status = mpd.status_get()
-        mpd_control_status = mpd.player_control_get()
-        is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
-        if is_playing:
-            self.blank_screen_time = self.timer() + BLANK_PERIOD
-            #self.show()
-        elif not is_playing and self.timer() > self.blank_screen_time: #and self.current_index != 1:
-            #self.current_index = 1
-            self.show()
+        try:
+            mpd_status = mpd.status_get()
+            mpd_control_status = mpd.player_control_get()
+            is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
+            if is_playing:
+                self.blank_screen_time = self.timer() + BLANK_PERIOD
+                #self.show()
+            elif not is_playing and self.timer() > self.blank_screen_time: #and self.current_index != 1:
+                #self.current_index = 1
+                self.show()
+        except:
+            pass
         self.hook_event_running = False
         return mpd_status
 
