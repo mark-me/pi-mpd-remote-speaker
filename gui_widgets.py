@@ -97,11 +97,24 @@ class Rectangle(Widget):
     def __init__(self, tag_name, screen, x, y, width, height):
         Widget.__init__(self, tag_name, screen, x, y, width, height)
         self.background_color = BLACK
+        self.background_alpha = 255
 
     def draw(self):
         """ Draws the label. """
         self.surface.fill(self.background_color)
+        self.surface.set_alpha(self.background_alpha)
         self.screen.blit(self.surface, (self.x_pos, self.y_pos))
+
+    def transparent_set(self, value):
+        """ Turns background transparent or opaque. """
+        if value:
+            self.background_alpha = 0
+        else:
+            self.background_alpha = 255
+
+    def background_alpha_set(self, value):
+        if -1 < value < 256:
+            self.background_alpha = value
 
 
 class Slider(Rectangle):
@@ -318,6 +331,15 @@ class LabelText(Widget):
         if self.caption != text:
             self.caption = text
             self.draw()
+
+    def adjust_to_caption_size(self):
+        self.width = self.font.size(self.caption)[0]
+        if self.alignment_horizontal == HOR_RIGHT:
+            test = self.screen.get_size()
+            self.x_pos = self.screen.get_size()[0] - self.width
+        self.surface = pygame.Surface((self.width, self.height))
+        self.draw()
+        return self.font.size(self.caption)[0]
 
     def draw(self):
         """ Draws the label.

@@ -20,13 +20,14 @@
 =======================================================
 """
 import pygame
+from PIL import Image, ImageFilter, ImageEnhance
+import asyncio
 
 from gui_screens import *
 from mpd_client import *
 from capture_audio import *
 from settings import *
-from PIL import Image, ImageFilter, ImageEnhance
-import numpy as np
+
 logging.info("ScreenPlaying definition")
 
 

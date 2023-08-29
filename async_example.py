@@ -6,15 +6,13 @@ from settings import *
 from mpd_client import *
 from capture_audio import *
 from gui_screens import *
-from gui_widgets import *
-
+from screen_blank import *
 
 class ScreenPlayer(Screen):
     """ Screen cover art
     """
     def __init__(self, screen_surface):
         Screen.__init__(self, screen_surface)
-        self.hook_event_running = False
         self.timer = pygame.time.get_ticks
         self.blank_screen_time = self.timer() + BLANK_PERIOD
         self.file_img_cover = 'default_cover_art.png'
@@ -32,8 +30,12 @@ class ScreenPlayer(Screen):
                                    self.file_img_cover))
         self.add_component(LabelText('lbl_track_title', self.surface, 0, 0, SCREEN_WIDTH, 38)) # SCREEN_HEIGHT - 42, SCREEN_WIDTH, 42))
         self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_BOTTOM)
-        self.components['lbl_track_title'].background_alpha_set(130)
+        self.components['lbl_track_title'].background_alpha_set(180)
         self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10))
+        self.add_component(LabelText('lbl_track_artist', self.surface, 0, SCREEN_HEIGHT - 40, SCREEN_WIDTH, 30))
+        self.components['lbl_track_artist'].set_alignment(HOR_RIGHT, VERT_TOP)
+        self.components['lbl_track_artist'].background_alpha_set(180)
+
 
     def create_background(self):
         image = Image.open(self.file_img_cover)
@@ -48,7 +50,10 @@ class ScreenPlayer(Screen):
         self.file_img_cover = mpd.now_playing.get_cover_art()
         self.components['pic_cover_art'].picture_set(self.file_img_cover)
         self.create_background()
-        self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.artist + ' - ' + mpd.now_playing.title)
+        self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + '    ')
+        self.components['lbl_track_title'].adjust_to_caption_size()
+        self.components['lbl_track_artist'].text_set('    ' + mpd.now_playing.artist + '    ')
+        self.components['lbl_track_artist'].adjust_to_caption_size()
         self.apply_color_theme()
         return super(ScreenPlayer, self).show()
 
@@ -63,7 +68,10 @@ class ScreenPlayer(Screen):
             if event == 'time_elapsed':
                 self.components['slide_time'].progress_percentage_set(playing.time_percentage)
             if event == 'playing_file':
-                self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + ' - ' + mpd.now_playing.artist)
+                self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + '    ')
+                self.components['lbl_track_title'].adjust_to_caption_size()
+                self.components['lbl_track_artist'].text_set('    ' + mpd.now_playing.artist + '    ')
+                self.components['lbl_track_artist'].adjust_to_caption_size()
             if event == 'album_change':
                 self.file_img_cover = mpd.now_playing.get_cover_art()
                 self.create_background()
@@ -112,25 +120,29 @@ class ScreenPlayer(Screen):
             color_font = (255, 255, 255)
         self.components['slide_time'].background_alpha = 130
         self.components['slide_time'].progress_color = color_complimentary
-        self.components['lbl_track_title'].background_alpha = 130
         self.components['lbl_track_title'].font_color = color_font
         self.components['lbl_track_title'].background_color = self.color
+        self.components['lbl_track_artist'].font_color = color_font
+        self.components['lbl_track_artist'].background_color = self.color
 
     async def hook_event(self):
-        self.hook_event_running = True
         try:
             mpd_status = mpd.status_get()
             mpd_control_status = mpd.player_control_get()
             is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
-            if is_playing:
-                self.blank_screen_time = self.timer() + BLANK_PERIOD
+            # if is_playing:
+            #     if self.screen_is_blank:
+            #         self.screen_blank.close()
+            #         self.screen_is_blank = False
+            #     self.blank_screen_time = self.timer() + BLANK_PERIOD
+            #     self.show()
+            # elif not is_playing and self.timer() > self.blank_screen_time: #and self.current_index != 1:
+            #     if not self.screen_is_blank:
+            #         self.screen_blank.show()
+            #         self.screen_is_blank = True
                 #self.show()
-            elif not is_playing and self.timer() > self.blank_screen_time: #and self.current_index != 1:
-                #self.current_index = 1
-                self.show()
         except:
             pass
-        self.hook_event_running = False
         return mpd_status
 
 

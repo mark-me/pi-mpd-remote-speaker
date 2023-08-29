@@ -31,3 +31,6 @@ class ScreenBlank(Screen):
 
     def show(self):
         return super(ScreenBlank, self).show()  # Draw screen
+
+    def loop(self):
+        pass
