@@ -6,7 +6,7 @@ from settings import *
 from mpd_client import *
 from capture_audio import *
 from gui_screens import *
-from screen_blank import *
+
 
 class ScreenPlayer(Screen):
     """ Screen cover art
@@ -58,10 +58,8 @@ class ScreenPlayer(Screen):
         return super(ScreenPlayer, self).show()
 
     def update(self):
-        try:
-            asyncio.run(self.hook_event())
-        except:
-            pass
+        hook = self.hook_event()
+        asyncio.run(hook)
         try:
             event = mpd.events.popleft()
             playing = mpd.now_playing
@@ -130,20 +128,22 @@ class ScreenPlayer(Screen):
             mpd_status = mpd.status_get()
             mpd_control_status = mpd.player_control_get()
             is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
-            # if is_playing:
-            #     if self.screen_is_blank:
-            #         self.screen_blank.close()
-            #         self.screen_is_blank = False
-            #     self.blank_screen_time = self.timer() + BLANK_PERIOD
-            #     self.show()
-            # elif not is_playing and self.timer() > self.blank_screen_time: #and self.current_index != 1:
-            #     if not self.screen_is_blank:
-            #         self.screen_blank.show()
-            #         self.screen_is_blank = True
-                #self.show()
+            if is_playing:
+                self.blank_screen_time = self.timer() + BLANK_PERIOD
+                self.show()
+            elif not is_playing and self.timer() > self.blank_screen_time: #and self.current_index != 1:
+                self.surface.fill((0,0,0))
+                pygame.display.flip()
+                while not is_playing:
+                    pygame.event.get()
+                    mpd_status = mpd.status_get()
+                    mpd_control_status = mpd.player_control_get()
+                    is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
+                self.blank_screen_time = self.timer() + BLANK_PERIOD
+                self.show()
         except:
             pass
-        return mpd_status
+        #return mpd_status
 
 
 def main():
@@ -157,5 +157,4 @@ def main():
     screen_player.show()
 
 if __name__ == "__main__":
-    # asyncio.run(main=loop())
     main()

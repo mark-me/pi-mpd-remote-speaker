@@ -32,7 +32,7 @@ os.environ['SDL_AUDIODRIVER'] = 'dsp'
 import pygame
 
 # Sound spectrometer settings
-INPUT_DEVICE_INDEX = 6
+INPUT_DEVICE_INDEX = 4
 INPUT_SOUND_RATE = 10000 # 44100
 INPUT_BLOCK_TIME = 0.005 # 30 ms
 
