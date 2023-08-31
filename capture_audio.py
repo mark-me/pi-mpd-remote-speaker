@@ -6,7 +6,6 @@ import pygame
 
 class AudioSpectrometer(object):
     def __init__(self, block_time=0.005, sound_rate=10000):
-        self.idx_input_device = idx_input_device
         self.pa = pyaudio.PyAudio()
         self.sound_rate = sound_rate
         self.frames_per_block = int(sound_rate * block_time)
