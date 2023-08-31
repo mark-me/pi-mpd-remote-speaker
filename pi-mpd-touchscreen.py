@@ -18,8 +18,7 @@ class ScreenPlayer(Screen):
         self.file_img_cover = 'default_cover_art.png'
         self.coverart_color = 0
         self.amplitude = 0
-        self.audio_spectrometer = AudioSpectrometer(idx_input_device=INPUT_DEVICE_INDEX,
-                                                    block_time=INPUT_BLOCK_TIME,
+        self.audio_spectrometer = AudioSpectrometer(block_time=INPUT_BLOCK_TIME,
                                                     sound_rate=INPUT_SOUND_RATE)
         self.create_background()
         self.add_component(Picture('pic_background',

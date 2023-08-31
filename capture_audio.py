@@ -5,7 +5,7 @@ import struct
 import pygame
 
 class AudioSpectrometer(object):
-    def __init__(self, idx_input_device, block_time=0.005, sound_rate=10000):
+    def __init__(self, block_time=0.005, sound_rate=10000):
         self.idx_input_device = idx_input_device
         self.pa = pyaudio.PyAudio()
         self.sound_rate = sound_rate
@@ -21,7 +21,7 @@ class AudioSpectrometer(object):
             devinfo = self.pa.get_device_info_by_index(i)
             print('Device %{}: %{}'.format(i, devinfo['name']))
 
-            for keyword in ['mic','input']:
+            for keyword in ['default']:
                 if keyword in devinfo['name'].lower():
                     print('Found an input: device {} - {}'.format(i, devinfo['name']))
                     device_index = i
@@ -39,7 +39,7 @@ class AudioSpectrometer(object):
                               channels = 1,
                               rate = self.sound_rate,
                               input = True,
-                              input_device_index = self.idx_input_device,
+                              input_device_index = device_index,
                               frames_per_buffer = self.frames_per_block)
         return stream
 
@@ -59,7 +59,7 @@ class AudioSpectrometer(object):
 
 if __name__ == '__main__':
 
-    audio = AudioSpectrometer(idx_input_device=9)
+    audio = AudioSpectrometer()
 
     pygame.init()
     screen = pygame.display.set_mode([800, 480])
