@@ -59,7 +59,7 @@ class AudioSpectrometer(object):
 
 if __name__ == '__main__':
 
-    audio = AudioSpectrometer(idx_input_device=6)
+    audio = AudioSpectrometer(idx_input_device=0)
 
     pygame.init()
     screen = pygame.display.set_mode([800, 480])
