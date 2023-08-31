@@ -42,7 +42,7 @@ RUN_ON_RASPBERRY_PI = os.uname()[4] == 'aarch64'
 # Setting up touch screen, set if statement to true on Raspberry Pi
 if RUN_ON_RASPBERRY_PI:
     os.environ['SDL_FBDEV'] = '/dev/fb1'
-    INPUT_DEVICE_INDEX = 9
+    INPUT_DEVICE_INDEX = 1
 
 # Display settings
 pygame.init() 	# Pygame initialization
