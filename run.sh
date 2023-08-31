@@ -13,7 +13,7 @@ case $SSH_CONNECTION in
   cd pi-mpd-touchscreen
   while true ; do
     source ".venv/bin/activate"
-    python3 pi-mpd-touchscreen.py
+    python3 pi-mpd-touchscreen.py  >> logfile.log 2>&1
     deactivate
     writelog "Exited with status $?"
     writelog "Restarting"
