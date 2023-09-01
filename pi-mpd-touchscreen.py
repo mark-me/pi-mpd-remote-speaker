@@ -84,7 +84,7 @@ class ScreenPlayer(Screen):
         self.redraw()
 
     def update_spectrometer(self):
-        change_factor = round(self.amplitude / 500)
+        change_factor = round(self.amplitude / 100)
         x_size = 800 + change_factor
         y_size = 480 # + change_factor
         x_pos = round((change_factor) / 2)
