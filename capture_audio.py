@@ -18,13 +18,12 @@ class AudioSpectrometer(object):
         device_index = None
         for i in range( self.pa.get_device_count() ):
             devinfo = self.pa.get_device_info_by_index(i)
-            print('Device %{}: %{}'.format(i, devinfo['name']))
+            #print('Device %{}: %{}'.format(i, devinfo['name']))
 
-            for keyword in ['default']:
-                if keyword in devinfo['name'].lower():
-                    print('Found an input: device {} - {}'.format(i, devinfo['name']))
-                    device_index = i
-                    return device_index
+            if devinfo['name'].lower() == 'default':
+                print('Found an input: device {} - {}'.format(i, devinfo['name']))
+                device_index = i
+                return device_index
 
         if device_index == None:
             print('No preferred input found; using default input device.')
