@@ -59,37 +59,8 @@ if __name__ == '__main__':
 
     audio = AudioSpectrometer()
 
-    pygame.init()
-    screen = pygame.display.set_mode([800, 480])
-    surface_background = pygame.Surface((800, 480))
-    image = pygame.image.load('background.png')
-    surface_background.blit(image, (0, 0))
-    surface_foreground = pygame.Surface((400,400))
-    color = (255,255,0)
-    surface_foreground.fill(color)
-    screen.blit(surface_background, (0, 0))
-    screen.blit(surface_foreground, (200, 40))
-
     running = True
     while running:
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
         amplitude = audio.listen()
-
-        screen.fill((255, 255, 255))
-        #print(amplitude / 1000)
-        x_size = 800 + amplitude / 700
-        y_size = 480 + amplitude / 700
-        x_pos = y_pos = - (amplitude / 700)/2
-
-        #scaled_image = pygame.transform.smoothscale(image, (x_size, y_size))
-        # surface_background.blit(scaled_image, (x_pos, x_pos))
-        surface_background_scaled = pygame.transform.scale(surface_background, (x_size, y_size))
-        screen.blit(surface_background_scaled, (x_pos, x_pos))
-        screen.blit(surface_foreground, (200, 40))
-        # pygame.draw.circle(screen, (0, 0, 255), (amplitude/100, amplitude/100), amplitude/100)
-        pygame.display.flip()
-    pygame.quit()
+        print(amplitude)
