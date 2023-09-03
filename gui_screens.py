@@ -173,7 +173,6 @@ class Screen(object):
             self.surface = screen_or_surface.surface
             self.hook_event = self.parent_screen.hook_event
         self.loop_active = True
-
         self.components = {}  # Interface dictionary
         self.color = BLACK
         self.gesture_detect = GestureDetector()
@@ -183,9 +182,9 @@ class Screen(object):
 
             :param widget: The widget that should be added to the dictionary
         """
-        self.components[widget.tag_name] = widget
+        self.components[widget.name] = widget
 
-    def show(self):
+    async def show(self):
         self.loop_active = True
         """ Displays the screen. """
         if self.parent_screen is not None:
@@ -195,7 +194,8 @@ class Screen(object):
             if value.visible:
                 value.draw()
         pygame.display.flip()
-        self.loop()
+        task_loop = asyncio.create_task(self.loop())
+        await task_loop
 
     def redraw(self):
         self.surface.fill(self.color)
@@ -213,11 +213,12 @@ class Screen(object):
             self.parent_screen.hook_event = self.hook_event
         self.loop_active = False
 
-    def loop(self):
+    async def loop(self):
         """ Loops for events """
         while self.loop_active:
             pygame.time.wait(PYGAME_EVENT_DELAY)
-            self.update()
+            task_update = asyncio.create_task(self.update())
+            await task_update
             for event in pygame.event.get():  # Do for all events in pygame's event queue
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
