@@ -146,8 +146,8 @@ class MPDNowPlaying(object):
                 binary = None
         return binary
 
-    def get_cover_art(self):
-        blob_cover = self.get_cover_binary(self.file)
+    async def get_cover_art(self):
+        blob_cover = await self.get_cover_binary(self.file)
         if blob_cover is None:
             file_cover_art = "default_cover_art.png"
         else:

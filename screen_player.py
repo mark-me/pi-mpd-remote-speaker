@@ -67,9 +67,9 @@ class ScreenPlayer(Screen):
         image = ImageEnhance.Brightness(image).enhance(0.6)
         image.save('background.png')
 
-    def show(self):
+    async def show(self):
         """ Displays the screen. """
-        self.file_img_cover = mpd.now_playing.get_cover_art()
+        self.file_img_cover = await mpd.now_playing.get_cover_art()
         self.components['pic_cover_art'].picture_set(self.file_img_cover)
         self.create_background()
         self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + '    ')
@@ -77,7 +77,7 @@ class ScreenPlayer(Screen):
         self.components['lbl_track_artist'].text_set('    ' + mpd.now_playing.artist + '    ')
         self.components['lbl_track_artist'].adjust_to_caption_size()
         self.apply_color_theme()
-        return super(ScreenPlayer, self).show()
+        return await super(ScreenPlayer, self).show()
 
     async def update(self):
         task_mpd = asyncio.create_task(self.hook_event())
@@ -115,7 +115,7 @@ class ScreenPlayer(Screen):
         y_pos = 0
         self.components['pic_background'].position_size_set(x=x_pos, y=y_pos, width=x_size, height=y_size)
 
-    def draw_cover_art(self):
+    async def draw_cover_art(self):
         left_position = 40
         hor_length = SCREEN_WIDTH - 40
         top_position = 0
@@ -124,7 +124,7 @@ class ScreenPlayer(Screen):
             cover_size = vert_length
         else:
             cover_size = hor_length
-        self.file_img_cover = mpd.now_playing.get_cover_art()
+        self.file_img_cover = await mpd.now_playing.get_cover_art()
         self.add_component(Picture(name='pic_cover_art', surface=self.layer_foreground,
                                    surface_pos=(left_position, top_position), widget_dims=(cover_size, cover_size), image_file=self.file_img_cover))
 

@@ -15,7 +15,7 @@ async def main():
     pygame.init()
     screen = pygame.display.set_mode([800, 480])
     screen_player = ScreenPlayer(screen)
-    screen_player.show()
+    await screen_player.show()
 
 
 if __name__ == "__main__":
