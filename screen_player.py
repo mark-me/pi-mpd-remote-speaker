@@ -19,42 +19,45 @@
 **screen_player.py**: Playback screen.
 =======================================================
 """
-import pygame
-from PIL import Image, ImageFilter, ImageEnhance
 import asyncio
+import sys
+from PIL import Image, ImageFilter, ImageEnhance
 
-from gui_screens import *
+from settings import *
 from mpd_client import *
 from capture_audio import *
-from settings import *
+from gui_screens import *
 
 logging.info("ScreenPlaying definition")
 
 
-class ScreenPlaying(Screen):
+class ScreenPlayer(Screen):
     """ Screen cover art
     """
-
     def __init__(self, screen_surface):
         Screen.__init__(self, screen_surface)
-        # Cover art
-        # self.draw_cover_art()
+        self.timer = pygame.time.get_ticks
+        self.blank_screen_time = self.timer() + BLANK_PERIOD
         self.file_img_cover = 'default_cover_art.png'
         self.coverart_color = 0
-        self.audio_spectrometer = AudioSpectrometer(idx_input_device=INPUT_DEVICE_INDEX,
-                                                    block_time=INPUT_BLOCK_TIME,
+        self.amplitude = 0
+        self.audio_spectrometer = AudioSpectrometer(block_time=INPUT_BLOCK_TIME,
                                                     sound_rate=INPUT_SOUND_RATE)
         self.create_background()
-        self.add_component(Picture('pic_background',
-                                   self.surface, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
-                                   'background.png'))
-        self.add_component(Picture('pic_cover_art',
-                                   self.surface, (SCREEN_WIDTH/2)-(SCREEN_HEIGHT/2) + 15, 15, SCREEN_HEIGHT - 40, SCREEN_HEIGHT - 40,
-                                   self.file_img_cover))
-        self.add_component(LabelText('lbl_track_title', self.surface, 0, 0, SCREEN_WIDTH, 38)) # SCREEN_HEIGHT - 42, SCREEN_WIDTH, 42))
-        self.components['lbl_track_title'].set_alignment(HOR_LEFT, VERT_BOTTOM)
-        self.components['lbl_track_title'].background_alpha_set(130)
-        self.add_component(Slider2('slide_time', self.surface, 0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10))
+        self.add_component(Picture(name='pic_background', surface=self.surface,
+                                   surface_pos=(0, 0), widget_dims =(SCREEN_WIDTH, SCREEN_HEIGHT), image_file='background.png'))
+        picture_pos = (((SCREEN_WIDTH/2)-(SCREEN_HEIGHT/2) + 15), 25)
+        self.add_component(Picture(name='pic_cover_art', surface=self.surface,
+                                   surface_pos=picture_pos, widget_dims =(SCREEN_HEIGHT - 40, SCREEN_HEIGHT - 40),
+                                   image_file=self.file_img_cover))
+        self.add_component(LabelText(name='lbl_track_title', surface=self.surface,
+                                     surface_pos=(0, 0), widget_dims=(SCREEN_WIDTH, 38), alignment=(HOR_LEFT, VERT_BOTTOM)))
+        self.components['lbl_track_title'].background_alpha_set(180)
+        self.add_component(Slider2(name='slide_time', surface=self.surface,
+                                   surface_pos=(0, SCREEN_HEIGHT - 10), widget_dims=(SCREEN_WIDTH, 10)))
+        self.add_component(LabelText(name='lbl_track_artist', surface=self.surface,
+                                     surface_pos=(0, SCREEN_HEIGHT - 42), widget_dims=(SCREEN_WIDTH, 32), alignment=(HOR_RIGHT, VERT_TOP)))
+        self.components['lbl_track_artist'].background_alpha_set(180)
 
     def create_background(self):
         image = Image.open(self.file_img_cover)
@@ -64,55 +67,55 @@ class ScreenPlaying(Screen):
         image = ImageEnhance.Brightness(image).enhance(0.6)
         image.save('background.png')
 
-    def show(self):
+    async def show(self):
         """ Displays the screen. """
-        self.components['pic_cover_art'].picture_set(mpd.now_playing.get_cover_art())
-        self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.artist + ' - ' + mpd.now_playing.title)
+        self.file_img_cover = await mpd.now_playing.get_cover_art()
+        self.components['pic_cover_art'].picture_set(self.file_img_cover)
+        self.create_background()
+        self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + '    ')
+        self.components['lbl_track_title'].adjust_to_caption_size()
+        self.components['lbl_track_artist'].text_set('    ' + mpd.now_playing.artist + '    ')
+        self.components['lbl_track_artist'].adjust_to_caption_size()
         self.apply_color_theme()
-        return super(ScreenPlaying, self).show()
+        return await super(ScreenPlayer, self).show()
 
-    def update(self):
-        while True:
-            try:
-                event = mpd.events.popleft()
-                playing = mpd.now_playing
-                logging.info("Update event: %s", event)
-
-                if event == 'time_elapsed':
-                    self.components['slide_time'].draw(playing.time_percentage)
-                if event == 'playing_file':
-                    self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + ' - ' + mpd.now_playing.artist)
-                if event == 'album_change':
-                    self.file_img_cover = mpd.now_playing.get_cover_art()
-                    self.create_background()
-                    self.components['pic_cover_art'].picture_set(self.file_img_cover)
-                    self.components['pic_background'].picture_set('background.png')
-                    self.apply_color_theme()
-                if event == 'album_change' or event == 'playing_file':
-                    super(ScreenPlaying, self).show()
-                self.update_spectrometer()
-                super(ScreenPlaying, self).show()
-
-            except IndexError:
-                break
+    async def update(self):
+        task_mpd = asyncio.create_task(self.hook_event())
+        await task_mpd
+        try:
+            event = mpd.events.popleft()
+            playing = mpd.now_playing
+            if event == 'time_elapsed':
+                self.components['slide_time'].progress_percentage_set(playing.time_percentage)
+            if event == 'playing_file':
+                self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + '    ')
+                self.components['lbl_track_title'].adjust_to_caption_size()
+                self.components['lbl_track_artist'].text_set('    ' + mpd.now_playing.artist + '    ')
+                self.components['lbl_track_artist'].adjust_to_caption_size()
+            if event == 'album_change':
+                self.file_img_cover = mpd.now_playing.get_cover_art()
+                self.create_background()
+                self.components['pic_cover_art'].picture_set(self.file_img_cover)
+                self.components['pic_background'].picture_set('background.png')
+                self.apply_color_theme()
+            if event == 'album_change' or event == 'playing_file':
+                task_show = asyncio.create_task(super(ScreenPlayer, self).show())
+                await task_show
+        except IndexError:
+            pass
+        self.amplitude = self.audio_spectrometer.listen()
+        self.update_spectrometer()
+        self.redraw()
 
     def update_spectrometer(self):
-        amplitude = self.audio_spectrometer.listen()
-        x_size = 800 + amplitude / 700
-        y_size = 480 + amplitude / 700
-        x_pos = y_pos = - (amplitude / 700)/2
+        change_factor = round(self.amplitude / 400)
+        x_size = 800 + change_factor
+        y_size = 480 # + change_factor
+        x_pos = round((change_factor) / 2)
+        y_pos = 0
         self.components['pic_background'].position_size_set(x=x_pos, y=y_pos, width=x_size, height=y_size)
 
-    def on_click(self, x, y):
-        tag_name = super(ScreenPlaying, self).on_click(x, y)
-        if tag_name == 'pic_cover_art':
-            if mpd.player_control_get() == 'play':
-                mpd.player_control_set('pause')
-            else:
-                mpd.player_control_set('play')
-        return 0
-
-    def draw_cover_art(self):
+    async def draw_cover_art(self):
         left_position = 40
         hor_length = SCREEN_WIDTH - 40
         top_position = 0
@@ -121,12 +124,9 @@ class ScreenPlaying(Screen):
             cover_size = vert_length
         else:
             cover_size = hor_length
-
-        self.file_img_cover = mpd.now_playing.get_cover_art()
-
-        self.add_component(Picture('pic_cover_art',
-                                   self.layer_foreground, left_position, top_position, cover_size, cover_size,
-                                   self.file_img_cover))
+        self.file_img_cover = await mpd.now_playing.get_cover_art()
+        self.add_component(Picture(name='pic_cover_art', surface=self.layer_foreground,
+                                   surface_pos=(left_position, top_position), widget_dims=(cover_size, cover_size), image_file=self.file_img_cover))
 
     def apply_color_theme(self):
         self.coverart_color = self.components['pic_cover_art'].color_main()
@@ -138,60 +138,29 @@ class ScreenPlaying(Screen):
             color_font = (0, 0, 0)
         else:
             color_font = (255, 255, 255)
-
         self.components['slide_time'].background_alpha = 130
         self.components['slide_time'].progress_color = color_complimentary
-        self.components['lbl_track_title'].background_alpha = 130
         self.components['lbl_track_title'].font_color = color_font
         self.components['lbl_track_title'].background_color = self.color
+        self.components['lbl_track_artist'].font_color = color_font
+        self.components['lbl_track_artist'].background_color = self.color
 
-
-class ScreenVolume(ScreenModal):
-    """ Screen setting volume
-    """
-
-    def __init__(self, screen):
-        ScreenModal.__init__(self, screen, "Volume")
-        self.window_x = 15
-        self.window_y = 52
-        self.window_width -= 2 * self.window_x
-        self.window_height -= 2 * self.window_y
-        self.outline_shown = True
-        self.title_color = GREEN
-        self.outline_color = GREEN
-
-        self.add_component(ButtonIcon('btn_mute', self.surface, ICO_VOLUME_MUTE, self.window_x + 5, self.window_y + 25))
-        self.components['btn_mute'].x_pos = self.window_x + self.window_width / 2 - self.components[
-            'btn_mute'].width / 2
-        self.add_component(
-            ButtonIcon('btn_volume_down', self.surface, ICO_VOLUME_DOWN, self.window_x + 5, self.window_y + 25))
-        self.add_component(
-            ButtonIcon('btn_volume_up', self.surface, ICO_VOLUME_UP, self.window_width - 40, self.window_y + 25))
-        self.add_component(
-            Slider('slide_volume', self.surface, self.window_x + 8, self.window_y + 63, self.window_width - 18, 30))
-        self.components['slide_volume'].progress_percentage_set(mpd.volume)
-        self.add_component(
-            ButtonText('btn_back', self.surface, self.window_x + self.window_width / 2 - 23, self.window_y + 98, 46, 32,
-                       "Back"))
-        self.components['btn_back'].button_color = CREAM
-
-    def on_click(self, x, y):
-        tag_name = super(ScreenModal, self).on_click(x, y)
-        if tag_name == 'btn_mute':
-            mpd.volume_mute_switch()
-            self.components['slide_volume'].progress_percentage_set(mpd.volume)
-        elif tag_name == 'btn_volume_down':
-            mpd.volume_set_relative(-10)
-            self.components['slide_volume'].progress_percentage_set(mpd.volume)
-        elif tag_name == 'btn_volume_up':
-            mpd.volume_set_relative(10)
-            self.components['slide_volume'].progress_percentage_set(mpd.volume)
-        elif tag_name == 'slide_volume':
-            mpd.volume_set(self.components['slide_volume'].progress_percentage)
-        elif tag_name == 'btn_back':
-            self.close()
-        if mpd.volume == 0 or mpd.volume_mute_get():
-            self.components['btn_mute'].set_image_file(ICO_VOLUME_MUTE_ACTIVE)
-        else:
-            self.components['btn_mute'].set_image_file(ICO_VOLUME_MUTE)
-        self.components['btn_mute'].draw()
+    async def hook_event(self):
+        mpd.status_get()
+        mpd_control_status = mpd.player_control_get()
+        is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
+        if is_playing:
+            self.blank_screen_time = self.timer() + BLANK_PERIOD
+            task_show = asyncio.create_task(self.show())
+            await task_show
+        elif not is_playing and self.timer() > self.blank_screen_time: #and self.current_index != 1:
+            self.surface.fill((0,0,0))
+            pygame.display.flip()
+            while not is_playing:
+                pygame.event.get()
+                mpd.status_get()
+                mpd_control_status = mpd.player_control_get()
+                is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
+            self.blank_screen_time = self.timer() + BLANK_PERIOD
+            task_show = asyncio.create_task(self.show())
+            await task_show

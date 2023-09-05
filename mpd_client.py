@@ -21,10 +21,9 @@
 """
 import logging
 
-import pygame
 import os
 import time
-import mpd
+import mpd.asyncio
 from collections import deque
 
 MPD_TYPE_ARTIST = 'artist'
@@ -72,7 +71,6 @@ def retry(func, ex_type=Exception, limit=0, wait_ms=100, wait_increase_ratio=2, 
 class MPDNowPlaying(object):
     """ Song information
     """
-
     def __init__(self, mpd_client):
         self.__mpd_client = mpd_client
         self.playing_type = ''
@@ -133,10 +131,10 @@ class MPDNowPlaying(object):
             self.time_total = self.make_time_string(0)  # Total time current
         return True
 
-    def get_cover_binary(self, uri):
+    async def get_cover_binary(self, uri):
         try:
             logging.info("Start first try to get cover art from %s", uri)
-            binary = self.__mpd_client.albumart(uri)["binary"]
+            binary = await self.__mpd_client.albumart(uri)["binary"]
             logging.info("End first try to get cover art")
         except:
             try:
@@ -148,8 +146,8 @@ class MPDNowPlaying(object):
                 binary = None
         return binary
 
-    def get_cover_art(self):
-        blob_cover = self.get_cover_binary(self.file)
+    async def get_cover_art(self):
+        blob_cover = await self.get_cover_binary(self.file)
         if blob_cover is None:
             file_cover_art = "default_cover_art.png"
         else:
@@ -208,12 +206,12 @@ class MPDController(object):
         self.__last_update_time = 0  # For checking last update time (milliseconds)
         self.__status = None  # mpc's current status output
 
-    def connect(self):
+    async def connect(self):
         """ Connects to mpd server.
             :return: Boolean indicating if successfully connected to mpd server.
         """
         try:
-            self.mpd_client.connect(self.host, self.port)
+            await self.mpd_client.connect(self.host, self.port)
         except Exception:
             logging.error("Failed to connect to MPD server: host: ", self.host, " port: ", self.port)
             return False
@@ -228,15 +226,15 @@ class MPDController(object):
         self.mpd_client.close()
         self.mpd_client.disconnect()
 
-    def __parse_mpc_status(self):
+    async def __parse_mpc_status(self):
         """ Parses the mpd status and fills mpd event queue
 
             :return: Boolean indicating if the status was changed
         """
         logging.info("Trying to get mpd status")
-        self.mpd_client.ping()
-        now_playing_new = retry(self.mpd_client.currentsong, logger=logging)
-
+        await self.mpd_client.ping() # Wake up MPD
+        # Song information
+        now_playing_new = await self.mpd_client.currentsong()
         if self.now_playing != now_playing_new and len(now_playing_new) > 0:  # Changed to a new song
             self.__now_playing_changed = True
             if self.now_playing is None or self.now_playing.file != now_playing_new['file']:
@@ -246,20 +244,17 @@ class MPDController(object):
                 logging.info("Album change event added")
                 self.events.append('album_change')
             self.now_playing.now_playing_set(now_playing_new)
-
-        status = retry(self.mpd_client.status, logger=logging)
-
+        # Player status
+        status = await self.mpd_client.status()
         if self.__status == status:
             return False
         self.__status = status
         if self.__player_control != status['state']:
             self.__player_control = status['state']
             self.events.append('player_control')
-
         if self.__player_control != 'stop':
             if self.now_playing.current_time_set(self.str_to_float(status['elapsed'])):
                 self.events.append('time_elapsed')
-
         return True
 
     def str_to_float(self, s):
@@ -274,10 +269,10 @@ class MPDController(object):
 
             :return: Returns boolean whether updated or not.
         """
-        time_elapsed = pygame.time.get_ticks() - self.__last_update_time
-        if pygame.time.get_ticks() > self.update_interval > time_elapsed:
+        time_elapsed = round(time.time()*1000) - self.__last_update_time
+        if round(time.time()*1000) > self.update_interval > time_elapsed:
             return False
-        self.__last_update_time = pygame.time.get_ticks()  # Reset update
+        self.__last_update_time = round(time.time()*1000)  # Reset update
         return self.__parse_mpc_status()  # Parse mpc status output
 
     def current_song_changed(self):

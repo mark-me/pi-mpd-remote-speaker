@@ -40,7 +40,7 @@ VERT_BOTTOM = 2
 class Widget(object):
     """ Widget is the base class of screen widgets and should not be instantiated by itself.
 
-        :param tag_name: Text identifying the widget
+        :param name: Text identifying the widget
         :param surface: The screen's rectangle where the widget is drawn on
         :param x: The horizontal starting position of the widget's rectangle
         :param y: The vertical starting position of the widget's rectangle
@@ -48,15 +48,13 @@ class Widget(object):
         :param height: The height of the widget's rectangle
     """
 
-    def __init__(self, tag_name, screen, x, y, width, height):
-        self.tag_name = tag_name
+    def __init__(self, name, screen, surface_pos = (0, 0), widget_dims = (0, 0)):
+        self.name = name
         self.visible = True
         self.screen = screen
-        self.surface = pygame.Surface((width, height))
-        self.x_pos = x
-        self.y_pos = y
-        self.width = width
-        self.height = height
+        self.surface = pygame.Surface(widget_dims)
+        self.x_pos, self.y_pos = surface_pos
+        self.width, self.height = widget_dims
         # self.rect = Rect(x, y, width, height)
         self.outline_visible = False
         self.outline_color = WHITE
@@ -68,7 +66,7 @@ class Widget(object):
 
     def on_click(self, x, y):
         """ The function called when a widget is clicked """
-        return self.tag_name
+        return self.name
 
     def set_font(self, font_name, font_size, font_color=CREAM):
         self.font = pygame.font.Font(font_name, font_size)
@@ -86,7 +84,7 @@ class Widget(object):
 class Rectangle(Widget):
     """ Drawing a rectangle on screen
 
-        :param tag_name: Text identifying the rectangle
+        :param name: Text identifying the rectangle
         :param surface: The screen's rectangle where the rectangle is drawn on
         :param x: The horizontal starting position of the rectangle's rectangle
         :param y: The vertical starting position of the rectangle's rectangle
@@ -94,8 +92,8 @@ class Rectangle(Widget):
         :param height: The height of the rectangle's rectangle
     """
 
-    def __init__(self, tag_name, screen, x, y, width, height):
-        Widget.__init__(self, tag_name, screen, x, y, width, height)
+    def __init__(self, name, screen, surface_pos, widget_dims):
+        Widget.__init__(self, name, screen, surface_pos, widget_dims)
         self.background_color = BLACK
         self.background_alpha = 255
 
@@ -117,10 +115,32 @@ class Rectangle(Widget):
             self.background_alpha = value
 
 
+class Rountagle(Rectangle):
+    """ Drawing a rectangle with rounded corners on screen
+
+        :param name: Text identifying the rectangle
+        :param surface: The screen's rectangle where the rectangle is drawn on
+        :param x: The horizontal starting position of the rectangle's rectangle
+        :param y: The vertical starting position of the rectangle's rectangle
+        :param width: The width of the rectangle's rectangle
+        :param height: The height of the rectangle's rectangle
+    """
+    def __init__(self, name, screen, surface_pos, widget_dims, corner_curve):
+        Widget.__init__(self, name, screen, surface_pos, widget_dims)
+        self.corner_curve = corner_curve
+
+    def draw(self):
+        """ Draws the label. """
+        self.surface.fill(self.background_color)
+        self.surface.set_alpha(self.background_alpha)
+
+        pygame.draw.rect(self.surface, (0, 0, 0), pygame.Rect(0, 0, self.width, self.height),  2, border_radius=10)
+        self.screen.blit(self.surface, (self.x_pos, self.y_pos))
+
 class Slider(Rectangle):
     """ A slider control
 
-        :param tag_name: Text identifying the slider
+        :param name: Text identifying the slider
         :param surface: The screen's rectangle where the slider is drawn on
         :param x: The horizontal starting position of the slider's rectangle
         :param y: The vertical starting position of the slider's rectangle
@@ -128,8 +148,8 @@ class Slider(Rectangle):
         :param height: The height of the slider's rectangle
     """
 
-    def __init__(self, tag_name, screen, x, y, width, height):
-        Rectangle.__init__(self, tag_name, screen, x, y, width, height)
+    def __init__(self, name, screen, surface_pos, widget_dims):
+        Rectangle.__init__(self, name, screen, surface_pos, widget_dims)
         self.progress_color = GREEN
         self.progress_percentage = 0
         self.progress_rect = Rect(x + 1, y + 1, 1, height - 2)
@@ -164,13 +184,13 @@ class Slider(Rectangle):
         """
         new_percentage = int((float(x - self.x_pos) / float(self.width)) * 100)
         self.progress_percentage_set(new_percentage)
-        return self.tag_name
+        return self.name
 
 
 class Slider2(Widget):
     """ A slider control with a different lay-out.
 
-        :param tag_name: Text identifying the slider
+        :param name: Text identifying the slider
         :param surface: The screen's rectangle where the slider is drawn on
         :param x: The horizontal starting position of the slider's rectangle
         :param y: The vertical starting position of the slider's rectangle
@@ -178,8 +198,8 @@ class Slider2(Widget):
         :param height: The height of the slider's rectangle
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height):
-        Widget.__init__(self, tag_name, surface, x, y, width, height)
+    def __init__(self, name, surface, surface_pos, widget_dims):
+        Widget.__init__(self, name, surface, surface_pos, widget_dims)
         self.background_color = BLACK
         self.background_alpha = 160
         self.background_surface = pygame.Surface((self.width, self.height))
@@ -220,13 +240,13 @@ class Slider2(Widget):
         """
         new_percentage = int((float(x - self.x_pos) / float(self.width)) * 100)
         self.progress_percentage_set(new_percentage)
-        return self.tag_name
+        return self.name
 
 
 class Picture(Widget):
     """ Picture on screen
 
-        :param tag_name: Text identifying the picture
+        :param name: Text identifying the picture
         :param surface: The screen's rectangle where the picture is drawn on
         :param x: The horizontal starting position of the picture's rectangle
         :param y: The vertical starting position of the picture's rectangle
@@ -234,8 +254,8 @@ class Picture(Widget):
         :param height: The height of the picture's rectangle
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height, image_file=""):
-        Widget.__init__(self, tag_name, surface, x, y, width, height)
+    def __init__(self, name, surface, surface_pos, widget_dims, image_file=""):
+        Widget.__init__(self, name, surface, surface_pos, widget_dims)
         self.picture_set(image_file)
 
     def draw(self):
@@ -244,7 +264,7 @@ class Picture(Widget):
         self.screen.blit(self.surface, (self.x_pos, self.y_pos))
 
     def on_click(self, x, y):
-        return self.tag_name
+        return self.name
 
     def picture_set(self, file_name):
         """ Sets the filename of the picture. """
@@ -266,7 +286,6 @@ class Picture(Widget):
         image = Image.open(self.__image_file)
         image = image.crop((0, self.height - 30, self.width, self.height))
         # Reduce to palette
-        #paletted = image.convert('P', palette=Image.ADAPTIVE, colors=qty_colors)
         paletted = image.convert('P', palette=Image.ADAPTIVE)
         # Find dominant colors
         palette = paletted.getpalette()
@@ -283,7 +302,7 @@ class Picture(Widget):
 class LabelText(Widget):
     """ LabelText is used to write text that needs to fit in a pre-defined rectangle.
 
-        :param tag_name: Text identifying the label
+        :param name: Text identifying the label
         :param surface: The screen's rectangle where the label is drawn on
         :param x: The horizontal starting position of the label's rectangle
         :param y: The vertical starting position of the label's rectangle
@@ -292,11 +311,10 @@ class LabelText(Widget):
         :param text: The text to be displayed in the label, default= ""
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height, text=""):
-        Widget.__init__(self, tag_name, surface, x, y, width, height)
+    def __init__(self, name, surface, surface_pos, widget_dims, text="", alignment=(HOR_LEFT, VERT_MID)):
+        Widget.__init__(self, name, surface, surface_pos, widget_dims)
         self.caption = text
-        self.alignment_horizontal = HOR_LEFT
-        self.alignment_vertical = VERT_MID
+        self.alignment_horizontal, self.alignment_vertical = alignment
         self.indent_horizontal = 0
         self.indent_vertical = 0
         self.outline_color = BLACK
@@ -381,7 +399,7 @@ class LabelText(Widget):
 class Memo(Widget):
     """ LabelText is used to write text that needs to fit in a pre-defined rectangle.
 
-        :param tag_name: Text identifying the memo field
+        :param name: Text identifying the memo field
         :param surface: The screen's rectangle where the memo field is drawn on
         :param x: The horizontal starting position of the memo field's rectangle
         :param y: The vertical starting position of the memo field's rectangle
@@ -390,8 +408,8 @@ class Memo(Widget):
         :param text: The text to be displayed in the memo, default= ""
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height, text=""):
-        Widget.__init__(self, tag_name, surface, x, y, width, height)
+    def __init__(self, name, surface, surface_pos, widget_dims, text=""):
+        Widget.__init__(self, name, surface, surface_pos, widget_dims)
         self.__caption = text.decode('utf-8')
         self.__caption_lines = []
         self.alignment_horizontal = HOR_LEFT
@@ -466,7 +484,7 @@ class Memo(Widget):
 class ButtonIcon(Widget):
     """ ButtonIcon class is a button that only displays an icon.
 
-        :param tag_name: Text identifying the widget
+        :param name: Text identifying the widget
         :param surface: The screen's rectangle where the button should be drawn
         :param x: The horizontal position of the button
         :param y: The vertical position of the button
@@ -475,10 +493,10 @@ class ButtonIcon(Widget):
         :ivar image_file: The button's icon image file name
     """
 
-    def __init__(self, tag_name, surface, image, x, y):
+    def __init__(self, name, surface, surface_pos, image,):
         self.image_file = image
         self.__icon = pygame.image.load(self.image_file)
-        Widget.__init__(self, tag_name, surface, x, y, self.__icon.get_width(), self.__icon.get_height())
+        Widget.__init__(self, name, surface, surface_pos, widget_dims=(self.__icon.get_width(), self.__icon.get_height()))
         self.caption = ""
 
     def draw(self, icon_file=None):
@@ -508,7 +526,7 @@ class ButtonIcon(Widget):
 class ButtonText(LabelText):
     """ ButtonText class is a button with text that uses two images for button rendering.
 
-        :param tag_name: Text identifying the widget
+        :param name: Text identifying the widget
         :param surface: The screen's rectangle where the button should be drawn
         :param x: The horizontal position of the button
         :param y: The vertical position of the button
@@ -521,10 +539,12 @@ class ButtonText(LabelText):
         :ivar alignment_vertical: The button's text vertical alignment, default = :py:const:VERT_MID
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height, text=""):
-        LabelText.__init__(self, tag_name, surface, x, y, width, height, text)
+    def __init__(self, name, surface, surface_pos, widget_dims, text=""):
+        LabelText.__init__(self, name, surface, surface_pos, widget_dims, text)
         self.transparent_set(True)
-        self.button_rect = (x + 1, y + 1, width - 2, height - 2)
+        x_pos, y_pos = surface_pos
+        width, height = widget_dims
+        self.button_rect = (x_pos + 1, y_pos + 1, width - 2, height - 2)
         self.button_color = CREAM
         self.__background_left = None
         self.__background_middle = None
@@ -545,18 +565,17 @@ class ButtonText(LabelText):
 class Switch(Widget):
     """ An on/off control for settings
 
-        :param tag_name: Text identifying the widget
+        :param name: Text identifying the widget
         :param surface: The screen's rectangle where the button should be drawn
         :param x: The horizontal position of the button
         :param y: The vertical position of the button
     """
 
-    def __init__(self, tag_name, surface, x, y):
+    def __init__(self, name, surface, surface_pos):
         self.__icon_on = pygame.image.load(ICO_SWITCH_ON)
         self.__icon_off = pygame.image.load(ICO_SWITCH_OFF)
-        self.width = self.__icon_on.get_width()
-        self.height = self.__icon_on.get_height()
-        Widget.__init__(self, tag_name, surface, x, y, self.width, self.height)
+        widget_dims = (self.__icon_on.get_width(), self.__icon_on.get_height())
+        Widget.__init__(self, name, surface, surface_pos, widget_dims)
         self.__is_on = False
 
     def set_on(self, boolean):
@@ -578,7 +597,7 @@ class Switch(Widget):
         self.screen.fill(self.background_color, self.rect)
         self.__is_on = not self.__is_on
         self.draw()
-        return self.tag_name
+        return self.name
 
     def draw(self):
         if self.__is_on:
@@ -591,7 +610,7 @@ class Switch(Widget):
 class ItemList(Widget):
     """ List of text items that can be clicked.
 
-        :param tag_name: Text identifying the list
+        :param name: Text identifying the list
         :param surface: The screen's rectangle where the list is drawn on
         :param x: The horizontal starting position of the list's rectangle
         :param y: The vertical starting position of the list's rectangle
@@ -616,8 +635,8 @@ class ItemList(Widget):
         :ivar item_selected_background_color: The selected list item background color, default = :py:const:WHITE
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height):
-        Widget.__init__(self, tag_name, surface, x, y, width, height)
+    def __init__(self, name, surface, surface_pos, widget_dims):
+        Widget.__init__(self, name, surface, surface_pos, widget_dims)
         self.list = []
         self.outline_visible = True
 
@@ -731,10 +750,10 @@ class ItemList(Widget):
         :param x_pos: The horizontal click position
         :param y_pos: The vertical click position
 
-        :return: return the ListItem's tag_name
+        :return: return the ListItem's name
         """
         self.clicked_item(x_pos, y_pos)
-        return self.tag_name
+        return self.name
 
     def show_next_items(self):
         """ Shows next page of items """
@@ -763,11 +782,11 @@ class WidgetContainer(Widget):
 
         :param surface: The screen's rectangle where the screen is drawn on
 
-        :ivar components: Dictionary holding the screen's widgets with a tag_name as key and the widget as value
+        :ivar components: Dictionary holding the screen's widgets with a name as key and the widget as value
     """
 
-    def __init__(self, tag_name, surface, x, y, width, height):
-        Widget.__init__(self, tag_name, surface, x, y, width, height)
+    def __init__(self, name, surface, surface_pos, widget_dims):
+        Widget.__init__(self, name, surface, surface_pos, widget_dims)
         self.components = {}  # Interface dictionary
 
     def add_component(self, widget):
@@ -775,7 +794,7 @@ class WidgetContainer(Widget):
 
             :param widget: The widget that should be added to the dictionary
         """
-        self.components[widget.tag_name] = widget
+        self.components[widget.name] = widget
 
     def draw(self):
         """ Displays the screen. """
@@ -791,7 +810,7 @@ class WidgetContainer(Widget):
             :param x: The horizontal click position
             :param y: The vertical click position
 
-            :return: The tag_name of the clicked component
+            :return: The name of the clicked component
         """
         for key, value in self.components.items():
             if isinstance(value, ButtonIcon) or isinstance(value, ButtonText) or \
