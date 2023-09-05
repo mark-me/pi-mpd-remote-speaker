@@ -212,9 +212,8 @@ class MPDController(object):
             :return: Boolean indicating if successfully connected to mpd server.
         """
         try:
-            task_connect = asyncio.create_task(self.mpd_client.connect(self.host, self.port))
-            await asyncio.wait(task_connect)
-        except Exception:
+            await self.mpd_client.connect(self.host, self.port)
+        except ConnectionError:
             logging.error("Failed to connect to MPD server: host: ", self.host, " port: ", self.port)
             return False
 
