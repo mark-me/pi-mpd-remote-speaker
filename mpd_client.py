@@ -23,8 +23,8 @@ import logging
 
 import os
 import time
-import mpd.asyncio
 import asyncio
+from mpd.asyncio import MPDClient
 from collections import deque
 
 MPD_TYPE_ARTIST = 'artist'
@@ -193,7 +193,7 @@ class MPDController(object):
     """
 
     def __init__(self, host, port = 6600):
-        self.mpd_client = mpd.MPDClient()
+        self.mpd_client = MPDClient()
         self.host = host
         self.port = port
         self.update_interval = 1000  # Interval between mpc status update calls (milliseconds)
@@ -216,9 +216,8 @@ class MPDController(object):
         except ConnectionError:
             logging.error("Failed to connect to MPD server: host: ", self.host, " port: ", self.port)
             return False
-
-        self.now_playing.now_playing_set(self.mpd_client.currentsong())
-
+        current_song = await self.mpd_client.currentsong()
+        self.now_playing.now_playing_set(current_song)
         return True
 
     def disconnect(self):
@@ -233,7 +232,7 @@ class MPDController(object):
             :return: Boolean indicating if the status was changed
         """
         logging.info("Trying to get mpd status")
-        await self.mpd_client.ping() # Wake up MPD
+        self.mpd_client.ping() # Wake up MPD
         # Song information
         now_playing_new = await self.mpd_client.currentsong()
         if self.now_playing != now_playing_new and len(now_playing_new) > 0:  # Changed to a new song

@@ -59,7 +59,7 @@ class ScreenPlayer(Screen):
                                      surface_pos=(0, SCREEN_HEIGHT - 42), widget_dims=(SCREEN_WIDTH, 32), alignment=(HOR_RIGHT, VERT_TOP)))
         self.components['lbl_track_artist'].background_alpha_set(180)
 
-    def create_background(self):
+    async def create_background(self):
         image = Image.open(self.file_img_cover)
         image = image.resize((SCREEN_WIDTH, SCREEN_WIDTH))
         image = image.crop((0, (SCREEN_WIDTH - SCREEN_HEIGHT)/2, SCREEN_WIDTH, SCREEN_WIDTH - (SCREEN_WIDTH - SCREEN_HEIGHT)/2))

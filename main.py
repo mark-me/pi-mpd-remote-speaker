@@ -8,7 +8,9 @@ from screen_player import *
 
 
 async def main():
-    if not mpd.connect():
+    task_connect = asyncio.create_task(mpd.connect())
+    is_connected = await task_connect
+    if not is_connected:
         print("Couldn't connect to the mpd server " + mpd.host + " on port " + str(
             mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
         sys.exit()
