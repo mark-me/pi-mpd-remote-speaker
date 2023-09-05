@@ -213,7 +213,7 @@ class MPDController(object):
         """
         try:
             task_connect = asyncio.create_task(self.mpd_client.connect(self.host, self.port))
-            await task_connect
+            await asyncio.wait(task_connect)
         except Exception:
             logging.error("Failed to connect to MPD server: host: ", self.host, " port: ", self.port)
             return False
