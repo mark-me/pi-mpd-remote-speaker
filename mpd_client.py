@@ -24,6 +24,7 @@ import logging
 import os
 import time
 import mpd.asyncio
+import asyncio
 from collections import deque
 
 MPD_TYPE_ARTIST = 'artist'
@@ -191,10 +192,10 @@ class MPDController(object):
     """ Controls playback and volume
     """
 
-    def __init__(self):
+    def __init__(self, host, port = 6600):
         self.mpd_client = mpd.MPDClient()
-        self.host = '192.168.0.25'
-        self.port = 6600
+        self.host = host
+        self.port = port
         self.update_interval = 1000  # Interval between mpc status update calls (milliseconds)
         self.volume = 0  # Playback volume
         self.now_playing = MPDNowPlaying(self.mpd_client)  # Dictionary containing currently playing song info
@@ -211,7 +212,8 @@ class MPDController(object):
             :return: Boolean indicating if successfully connected to mpd server.
         """
         try:
-            await self.mpd_client.connect(self.host, self.port)
+            task_connect = asyncio.create_task(self.mpd_client.connect(self.host, self.port))
+            await task_connect
         except Exception:
             logging.error("Failed to connect to MPD server: host: ", self.host, " port: ", self.port)
             return False
@@ -263,7 +265,7 @@ class MPDController(object):
         except ValueError:
             return float(0)
 
-    def status_get(self):
+    async def status_get(self):
         """ Updates mpc data, returns True when status data is updated. Wait at
             least 'update_interval' milliseconds before updating mpc status data.
 
@@ -273,7 +275,7 @@ class MPDController(object):
         if round(time.time()*1000) > self.update_interval > time_elapsed:
             return False
         self.__last_update_time = round(time.time()*1000)  # Reset update
-        return self.__parse_mpc_status()  # Parse mpc status output
+        return await self.__parse_mpc_status()  # Parse mpc status output
 
     def current_song_changed(self):
         if self.__now_playing_changed:
@@ -312,4 +314,4 @@ class MPDController(object):
 
 
 logging.info("Start mpd controller")
-mpd = MPDController()
+mpd = MPDController(host='192.168.0.25')
