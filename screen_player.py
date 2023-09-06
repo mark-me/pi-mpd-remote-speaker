@@ -38,12 +38,12 @@ class ScreenPlayer(Screen):
         Screen.__init__(self, screen_surface)
         self.timer = pygame.time.get_ticks
         self.blank_screen_time = self.timer() + BLANK_PERIOD
+        self.is_blank_screen = False
         self.file_img_cover = 'default_cover_art.png'
         self.coverart_color = 0
         self.amplitude = 0
         self.audio_spectrometer = AudioSpectrometer(block_time=INPUT_BLOCK_TIME,
                                                     sound_rate=INPUT_SOUND_RATE)
-        self.create_background()
         self.add_component(Picture(name='pic_background', surface=self.surface,
                                    surface_pos=(0, 0), widget_dims =(SCREEN_WIDTH, SCREEN_HEIGHT), image_file='background.png'))
         picture_pos = (((SCREEN_WIDTH/2)-(SCREEN_HEIGHT/2) + 15), 25)
@@ -71,7 +71,8 @@ class ScreenPlayer(Screen):
         """ Displays the screen. """
         self.file_img_cover = await mpd.now_playing.get_cover_art()
         self.components['pic_cover_art'].picture_set(self.file_img_cover)
-        self.create_background()
+        await self.create_background()
+        self.components['pic_background'].picture_set('background.png')
         self.components['lbl_track_title'].text_set('    ' + mpd.now_playing.title + '    ')
         self.components['lbl_track_title'].adjust_to_caption_size()
         self.components['lbl_track_artist'].text_set('    ' + mpd.now_playing.artist + '    ')
@@ -94,7 +95,7 @@ class ScreenPlayer(Screen):
                 self.components['lbl_track_artist'].adjust_to_caption_size()
             if event == 'album_change':
                 self.file_img_cover = mpd.now_playing.get_cover_art()
-                self.create_background()
+                await self.create_background()
                 self.components['pic_cover_art'].picture_set(self.file_img_cover)
                 self.components['pic_background'].picture_set('background.png')
                 self.apply_color_theme()
@@ -108,7 +109,7 @@ class ScreenPlayer(Screen):
         self.redraw()
 
     def update_spectrometer(self):
-        change_factor = round(self.amplitude / 400)
+        change_factor = round(self.amplitude / 50)
         x_size = 800 + change_factor
         y_size = 480 # + change_factor
         x_pos = round((change_factor) / 2)
@@ -146,14 +147,19 @@ class ScreenPlayer(Screen):
         self.components['lbl_track_artist'].background_color = self.color
 
     async def hook_event(self):
-        mpd.status_get()
-        mpd_control_status = mpd.player_control_get()
+        await mpd.status_get()
+        task_control = asyncio.create_task(mpd.player_control_get())
+        mpd_control_status = await task_control
         is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
         if is_playing:
             self.blank_screen_time = self.timer() + BLANK_PERIOD
-            task_show = asyncio.create_task(self.show())
-            await task_show
+            if self.is_blank_screen:
+                task_show = asyncio.create_task(self.show())
+                await task_show
+            else:
+                self.redraw()
         elif not is_playing and self.timer() > self.blank_screen_time: #and self.current_index != 1:
+            self.is_blank_screen = True
             self.surface.fill((0,0,0))
             pygame.display.flip()
             while not is_playing:

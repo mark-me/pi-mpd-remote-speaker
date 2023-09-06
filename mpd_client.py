@@ -135,17 +135,19 @@ class MPDNowPlaying(object):
     async def get_cover_binary(self, uri):
         try:
             logging.info("Start first try to get cover art from %s", uri)
-            binary = await self.__mpd_client.albumart(uri)["binary"]
+            task_cover = asyncio.create_task(self.__mpd_client.albumart(uri))
+            cover = await task_cover
             logging.info("End first try to get cover art")
         except:
             try:
                 logging.warning("Could not retrieve album cover using albumart() of %s", uri)
-                binary = self.__mpd_client.readpicture(uri)["binary"]
+                task_cover = asyncio.create_task(self.__mpd_client.readpicture(uri))
+                cover = await task_cover
                 logging.info("After second try to get cover art using readpicture() of %s", uri)
             except:
                 logging.warning("Could not retrieve album cover of %s", uri)
                 binary = None
-        return binary
+        return cover["binary"]
 
     async def get_cover_art(self):
         blob_cover = await self.get_cover_binary(self.file)
