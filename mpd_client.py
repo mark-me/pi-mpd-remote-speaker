@@ -307,9 +307,9 @@ class MPDController(object):
         except:
             logging.error("Could not send %s command to MPD", play_status)
 
-    def player_control_get(self):
+    async def player_control_get(self):
         """ :return: Current playback mode. """
-        self.status_get()
+        await mpd.status_get()
         return self.__player_control
 
 

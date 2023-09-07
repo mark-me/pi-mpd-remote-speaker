@@ -109,7 +109,7 @@ class ScreenPlayer(Screen):
         self.redraw()
 
     def update_spectrometer(self):
-        change_factor = round(self.amplitude / 50)
+        change_factor = round(self.amplitude / 400)
         x_size = 800 + change_factor
         y_size = 480 # + change_factor
         x_pos = round((change_factor) / 2)
@@ -164,8 +164,8 @@ class ScreenPlayer(Screen):
             pygame.display.flip()
             while not is_playing:
                 pygame.event.get()
-                mpd.status_get()
-                mpd_control_status = mpd.player_control_get()
+                await mpd.status_get()
+                mpd_control_status = await mpd.player_control_get()
                 is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
             self.blank_screen_time = self.timer() + BLANK_PERIOD
             task_show = asyncio.create_task(self.show())
