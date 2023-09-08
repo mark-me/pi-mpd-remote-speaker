@@ -10,7 +10,6 @@ writelog() {
 case $SSH_CONNECTION in
   '')
   writelog "Starting"
-  cd pi-mpd-touchscreen
   while true ; do
     source ".venv/bin/activate"
     python3 main.py  >> logfile.log 2>&1
