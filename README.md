@@ -23,6 +23,7 @@ sudo service snapclient start
 
 ### Git
 
+Clone git and remember credentials
 ```bash
 git config --global user.name "Mark Zwart"
 git config --global user.email "mark.zwart@pobox.com"
@@ -30,10 +31,21 @@ git config credential.helper store
 git clone https://github.com/mark-me/pi-mpd-touchscreen.git
 ```
 
+Create virtual environment
 ```bash
 sudo apt install python3-pip python3-virtualenv -y
 cd pi-mpd-touchscreen
 virtualenv .env
 source .env/bin/activate
 pip install -r requirements.txt
+```
+
+Create autostart for LDXE desktop
+```bash
+nano .config/lxsession/LXDE-pi/autostart
+```
+
+Add entry
+```
+@bash /home/mark/pi-mpd-touchscreen/run.sh
 ```
