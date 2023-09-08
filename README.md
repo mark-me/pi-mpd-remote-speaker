@@ -40,7 +40,7 @@ source .env/bin/activate
 pip install -r requirements.txt
 ```
 
-Create autostart for LDXE desktop
+Create autostart for LXDE desktop
 ```bash
 nano .config/lxsession/LXDE-pi/autostart
 ```
