@@ -21,10 +21,10 @@
 """
 import logging
 
-import pygame
 import os
 import time
-import mpd
+import asyncio
+from mpd.asyncio import MPDClient
 from collections import deque
 
 MPD_TYPE_ARTIST = 'artist'
@@ -72,7 +72,6 @@ def retry(func, ex_type=Exception, limit=0, wait_ms=100, wait_increase_ratio=2, 
 class MPDNowPlaying(object):
     """ Song information
     """
-
     def __init__(self, mpd_client):
         self.__mpd_client = mpd_client
         self.playing_type = ''
@@ -133,23 +132,25 @@ class MPDNowPlaying(object):
             self.time_total = self.make_time_string(0)  # Total time current
         return True
 
-    def get_cover_binary(self, uri):
+    async def get_cover_binary(self, uri):
         try:
             logging.info("Start first try to get cover art from %s", uri)
-            binary = self.__mpd_client.albumart(uri)["binary"]
+            cover = await self.__mpd_client.albumart(uri)
+            binary = cover['binary']
             logging.info("End first try to get cover art")
         except:
             try:
                 logging.warning("Could not retrieve album cover using albumart() of %s", uri)
-                binary = self.__mpd_client.readpicture(uri)["binary"]
+                cover = await self.__mpd_client.readpicture(uri)
+                binary = cover['binary']
                 logging.info("After second try to get cover art using readpicture() of %s", uri)
             except:
                 logging.warning("Could not retrieve album cover of %s", uri)
                 binary = None
         return binary
 
-    def get_cover_art(self):
-        blob_cover = self.get_cover_binary(self.file)
+    async def get_cover_art(self):
+        blob_cover = await self.get_cover_binary(self.file)
         if blob_cover is None:
             file_cover_art = "default_cover_art.png"
         else:
@@ -193,10 +194,10 @@ class MPDController(object):
     """ Controls playback and volume
     """
 
-    def __init__(self):
-        self.mpd_client = mpd.MPDClient()
-        self.host = '192.168.0.25'
-        self.port = 6600
+    def __init__(self, host, port = 6600):
+        self.mpd_client = MPDClient()
+        self.host = host
+        self.port = port
         self.update_interval = 1000  # Interval between mpc status update calls (milliseconds)
         self.volume = 0  # Playback volume
         self.now_playing = MPDNowPlaying(self.mpd_client)  # Dictionary containing currently playing song info
@@ -208,18 +209,17 @@ class MPDController(object):
         self.__last_update_time = 0  # For checking last update time (milliseconds)
         self.__status = None  # mpc's current status output
 
-    def connect(self):
+    async def connect(self):
         """ Connects to mpd server.
             :return: Boolean indicating if successfully connected to mpd server.
         """
         try:
-            self.mpd_client.connect(self.host, self.port)
-        except Exception:
+            await self.mpd_client.connect(self.host, self.port)
+        except ConnectionError:
             logging.error("Failed to connect to MPD server: host: ", self.host, " port: ", self.port)
             return False
-
-        self.now_playing.now_playing_set(self.mpd_client.currentsong())
-
+        current_song = await self.mpd_client.currentsong()
+        self.now_playing.now_playing_set(current_song)
         return True
 
     def disconnect(self):
@@ -228,15 +228,15 @@ class MPDController(object):
         self.mpd_client.close()
         self.mpd_client.disconnect()
 
-    def __parse_mpc_status(self):
+    async def __parse_mpc_status(self):
         """ Parses the mpd status and fills mpd event queue
 
             :return: Boolean indicating if the status was changed
         """
         logging.info("Trying to get mpd status")
-        self.mpd_client.ping()
-        now_playing_new = retry(self.mpd_client.currentsong, logger=logging)
-
+        self.mpd_client.ping() # Wake up MPD
+        # Song information
+        now_playing_new = await self.mpd_client.currentsong()
         if self.now_playing != now_playing_new and len(now_playing_new) > 0:  # Changed to a new song
             self.__now_playing_changed = True
             if self.now_playing is None or self.now_playing.file != now_playing_new['file']:
@@ -246,20 +246,17 @@ class MPDController(object):
                 logging.info("Album change event added")
                 self.events.append('album_change')
             self.now_playing.now_playing_set(now_playing_new)
-
-        status = retry(self.mpd_client.status, logger=logging)
-
+        # Player status
+        status = await self.mpd_client.status()
         if self.__status == status:
             return False
         self.__status = status
         if self.__player_control != status['state']:
             self.__player_control = status['state']
             self.events.append('player_control')
-
         if self.__player_control != 'stop':
             if self.now_playing.current_time_set(self.str_to_float(status['elapsed'])):
                 self.events.append('time_elapsed')
-
         return True
 
     def str_to_float(self, s):
@@ -268,17 +265,17 @@ class MPDController(object):
         except ValueError:
             return float(0)
 
-    def status_get(self):
+    async def status_get(self):
         """ Updates mpc data, returns True when status data is updated. Wait at
             least 'update_interval' milliseconds before updating mpc status data.
 
             :return: Returns boolean whether updated or not.
         """
-        time_elapsed = pygame.time.get_ticks() - self.__last_update_time
-        if pygame.time.get_ticks() > self.update_interval > time_elapsed:
+        time_elapsed = round(time.time()*1000) - self.__last_update_time
+        if round(time.time()*1000) > self.update_interval > time_elapsed:
             return False
-        self.__last_update_time = pygame.time.get_ticks()  # Reset update
-        return self.__parse_mpc_status()  # Parse mpc status output
+        self.__last_update_time = round(time.time()*1000)  # Reset update
+        return await self.__parse_mpc_status()  # Parse mpc status output
 
     def current_song_changed(self):
         if self.__now_playing_changed:
@@ -310,11 +307,11 @@ class MPDController(object):
         except:
             logging.error("Could not send %s command to MPD", play_status)
 
-    def player_control_get(self):
+    async def player_control_get(self):
         """ :return: Current playback mode. """
-        self.status_get()
+        await mpd.status_get()
         return self.__player_control
 
 
 logging.info("Start mpd controller")
-mpd = MPDController()
+mpd = MPDController(host='192.168.0.25')

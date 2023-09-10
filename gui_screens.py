@@ -21,6 +21,7 @@ __author__ = 'Mark Zwart'
 # along with pi-jukebox. If not, see < http://www.gnu.org/licenses/ >.
 #
 # (C) 2015- by Mark Zwart, <mark.zwart@pobox.com>
+import asyncio
 
 from gui_widgets import *
 from settings import *
@@ -146,12 +147,12 @@ class ScreenControl(object):
             if self.current_index < len(self.screen_list):
                 self.current_index = self.screen_list[self.current_index].show()
 
-    def add_screen(self, screen, loop_hook_function=None):
+    def add_screen(self, screen, event_hook_function=None):
         """ Adds screen to list """
         self.screen_list.append(screen)
         added_index = len(self.screen_list) - 1
-        if loop_hook_function is not None:
-            self.screen_list[added_index].loop_hook = loop_hook_function
+        if event_hook_function is not None:
+            self.screen_list[added_index].hook_event = event_hook_function
 
 
 class Screen(object):
@@ -170,9 +171,8 @@ class Screen(object):
         elif isinstance(screen_or_surface, Screen):
             self.parent_screen = screen_or_surface
             self.surface = screen_or_surface.surface
-            self.loop_hook = self.parent_screen.loop_hook
+            self.hook_event = self.parent_screen.hook_event
         self.loop_active = True
-
         self.components = {}  # Interface dictionary
         self.color = BLACK
         self.gesture_detect = GestureDetector()
@@ -182,9 +182,9 @@ class Screen(object):
 
             :param widget: The widget that should be added to the dictionary
         """
-        self.components[widget.tag_name] = widget
+        self.components[widget.name] = widget
 
-    def show(self):
+    async def show(self):
         self.loop_active = True
         """ Displays the screen. """
         if self.parent_screen is not None:
@@ -194,7 +194,15 @@ class Screen(object):
             if value.visible:
                 value.draw()
         pygame.display.flip()
-        self.loop()
+        task_loop = asyncio.create_task(self.loop())
+        await task_loop
+
+    def redraw(self):
+        self.surface.fill(self.color)
+        for key, value in self.components.items():
+            if value.visible:
+                value.draw()
+        pygame.display.flip()
 
     def update(self):
         pass
@@ -202,16 +210,15 @@ class Screen(object):
     def close(self):
         if self.parent_screen is not None:
             self.parent_screen.active = True
-            self.parent_screen.loop_hook = self.loop_hook
+            self.parent_screen.hook_event = self.hook_event
         self.loop_active = False
 
-    def loop(self):
+    async def loop(self):
         """ Loops for events """
         while self.loop_active:
-
             pygame.time.wait(PYGAME_EVENT_DELAY)
-            if self.loop_hook():  # and now <= deadline:
-                self.update()
+            task_update = asyncio.create_task(self.update())
+            await task_update
             for event in pygame.event.get():  # Do for all events in pygame's event queue
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
@@ -233,8 +240,8 @@ class Screen(object):
             y = self.gesture_detect.y_start
             self.on_swipe(x, y, gesture)
 
-    def loop_hook(self):
-        pass
+    async def hook_event(self):
+        return False
 
     def on_click(self, x, y):
         """ Determines which component was clicked and fires its click function in turn
