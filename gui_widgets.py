@@ -52,7 +52,7 @@ class Widget(object):
         self.name = name
         self.visible = True
         self.screen = screen
-        self.surface = pygame.Surface(widget_dims)
+        self.surface = pygame.Surface(widget_dims, pygame.SRCALPHA)
         self.x_pos, self.y_pos = surface_pos
         self.width, self.height = widget_dims
         # self.rect = Rect(x, y, width, height)
@@ -152,7 +152,7 @@ class Slider(Rectangle):
         Rectangle.__init__(self, name, screen, surface_pos, widget_dims)
         self.progress_color = GREEN
         self.progress_percentage = 0
-        self.progress_rect = Rect(x + 1, y + 1, 1, height - 2)
+        self.progress_rect = Rect(self.x_pos + 1, self.y_pos + 1, 1, self.height - 2)
         self.caption_visible = True
 
     def draw(self, percentage=None):

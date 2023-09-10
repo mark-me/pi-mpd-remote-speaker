@@ -44,6 +44,11 @@ Create autostart for LXDE desktop
 ```bash
 nano .config/lxsession/LXDE-pi/autostart
 ```
+or
+
+```bash
+sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
+```
 
 Add entry
 ```
