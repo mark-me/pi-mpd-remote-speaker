@@ -94,7 +94,7 @@ class ScreenPlayer(Screen):
                 self.components['lbl_track_artist'].text_set('    ' + mpd.now_playing.artist + '    ')
                 self.components['lbl_track_artist'].adjust_to_caption_size()
             if event == 'album_change':
-                self.file_img_cover = mpd.now_playing.get_cover_art()
+                self.file_img_cover = await mpd.now_playing.get_cover_art()
                 await self.create_background()
                 self.components['pic_cover_art'].picture_set(self.file_img_cover)
                 self.components['pic_background'].picture_set('background.png')
@@ -154,8 +154,9 @@ class ScreenPlayer(Screen):
         if is_playing:
             self.blank_screen_time = self.timer() + BLANK_PERIOD
             if self.is_blank_screen:
-                task_show = asyncio.create_task(self.show())
-                await task_show
+                self.surface.fill(pygame.Color(0,0,0,0))
+                self.is_blank_screen = False
+                await self.show()
             else:
                 self.redraw()
         elif not is_playing and self.timer() > self.blank_screen_time: #and self.current_index != 1:
@@ -168,5 +169,4 @@ class ScreenPlayer(Screen):
                 mpd_control_status = await mpd.player_control_get()
                 is_playing = mpd_control_status != 'pause' and mpd_control_status != 'stop'
             self.blank_screen_time = self.timer() + BLANK_PERIOD
-            task_show = asyncio.create_task(self.show())
-            await task_show
+            await self.show()

@@ -15,7 +15,7 @@ async def main():
             mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
         sys.exit()
     pygame.init()
-    screen = pygame.display.set_mode([800, 480])
+    screen = pygame.display.set_mode([800, 480], flags=SRCALPHA)
     screen_player = ScreenPlayer(screen)
     await screen_player.show()
 
