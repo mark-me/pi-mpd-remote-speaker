@@ -1,5 +1,7 @@
 #! /bin/bash
 
+cd /home/mark/pi-mpd-touchscreen
+
 LOGFILE=restart.txt
 
 writelog() {
