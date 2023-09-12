@@ -52,12 +52,11 @@ DISPLAY_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 480
 PYGAME_EVENT_DELAY = 0 #25
 
 if RUN_ON_RASPBERRY_PI:  # If started on Raspberry Pi
-    display_flags = pygame.FULLSCREEN  # Turn on video acceleration
+    display_flags = pygame.FULLSCREEN | pygame.SRCALPHA # Turn on video acceleration
     SCREEN = pygame.display.set_mode(DISPLAY_SIZE, display_flags)
-    logging.warning("Runs on Raspberry Pi")
     pygame.mouse.set_visible(False)                                 # Hide mouse cursor
 else:
-    SCREEN = pygame.display.set_mode(DISPLAY_SIZE)
+    SCREEN = pygame.display.set_mode(DISPLAY_SIZE, pygame.SRCALPHA)
     logging.warning("Not running on a Raspberry Pi")
 
 #: The directory where resources like button icons or the font file is stored.
