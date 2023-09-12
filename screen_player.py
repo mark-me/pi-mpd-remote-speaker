@@ -20,7 +20,6 @@
 =======================================================
 """
 import asyncio
-import sys
 from PIL import Image, ImageFilter, ImageEnhance
 
 from settings import *
