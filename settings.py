@@ -38,6 +38,7 @@ INPUT_BLOCK_TIME = 0.005 # 30 ms
 
 #: Switches between development/debugging on your desktop/laptop versus running on your Raspberry Pi
 RUN_ON_RASPBERRY_PI = os.uname()[4] == 'aarch64'
+print(os.uname()[4])
 
 # Setting up touch screen, set if statement to true on Raspberry Pi
 if RUN_ON_RASPBERRY_PI:
@@ -53,10 +54,11 @@ PYGAME_EVENT_DELAY = 0 #25
 if RUN_ON_RASPBERRY_PI:  # If started on Raspberry Pi
     display_flags = pygame.FULLSCREEN  # Turn on video acceleration
     SCREEN = pygame.display.set_mode(DISPLAY_SIZE, display_flags)
-    print("Full screen")
+    print("Runs on Raspberry Pi")
     pygame.mouse.set_visible(False)                                 # Hide mouse cursor
 else:
     SCREEN = pygame.display.set_mode(DISPLAY_SIZE)
+    print("Not running on a Raspberry Pi")
 
 #: The directory where resources like button icons or the font file is stored.
 RESOURCES = os.path.dirname(__file__) + '/resources/'
