@@ -58,7 +58,7 @@ if RUN_ON_RASPBERRY_PI:  # If started on Raspberry Pi
     pygame.mouse.set_visible(False)                                 # Hide mouse cursor
 else:
     SCREEN = pygame.display.set_mode(DISPLAY_SIZE)
-    print("Not running on a Raspberry Pi")
+    logging.warning("Not running on a Raspberry Pi")
 
 #: The directory where resources like button icons or the font file is stored.
 RESOURCES = os.path.dirname(__file__) + '/resources/'
