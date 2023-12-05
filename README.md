@@ -33,6 +33,7 @@ git clone https://github.com/mark-me/pi-mpd-touchscreen.git
 
 Create virtual environment
 ```bash
+sudo apt install portaudio19-dev
 sudo apt install python3-pip python3-virtualenv -y
 cd pi-mpd-touchscreen
 virtualenv .env
