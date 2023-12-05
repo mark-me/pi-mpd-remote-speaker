@@ -55,3 +55,25 @@ Add entry
 ```
 @bash /home/mark/pi-mpd-touchscreen/run.sh
 ```
+
+### KDE Connect
+
+Create autostart link
+```
+mkdir /home/mark/.config/autostart
+nano /home/mark/.config/autostart/kdeconnect.desktop
+```
+Add to file
+```
+Desktop Entry]
+Type=Application
+Name=KDE Connect
+Exec=/usr/bin/kdeconnect-indicator
+```
+reboot
+
+Connect
+```
+kdeconnect-cli -l
+kdeconnect-cli --pair --device <device-id>
+```
