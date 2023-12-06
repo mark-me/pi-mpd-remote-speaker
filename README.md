@@ -43,6 +43,15 @@ pip install -r requirements.txt
 
 Create autostart for LXDE desktop
 ```bash
+mkdir /home/mark/.config/autostart
+nano /home/mark/.config/autostart/music.desktop
+```
+
+```
+nano /home/mark/.config/autostart/music.desktop
+```
+
+```bash
 nano .config/lxsession/LXDE-pi/autostart
 ```
 or
@@ -65,7 +74,7 @@ nano /home/mark/.config/autostart/kdeconnect.desktop
 ```
 Add to file
 ```
-Desktop Entry]
+[Desktop Entry]
 Type=Application
 Name=KDE Connect
 Exec=/usr/bin/kdeconnect-indicator
