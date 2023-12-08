@@ -13,6 +13,7 @@ nano ~/.zshrc
 ```
 
 ## Install snapclient
+
 ```bash
 sudo apt install snapclient -y
 sudo service snapclient enable
@@ -24,6 +25,7 @@ sudo service snapclient start
 ### Git
 
 Clone git and remember credentials
+
 ```bash
 git config --global user.name "Mark Zwart"
 git config --global user.email "mark.zwart@pobox.com"
@@ -32,6 +34,7 @@ git clone https://github.com/mark-me/pi-mpd-touchscreen.git
 ```
 
 Create virtual environment
+
 ```bash
 sudo apt install portaudio19-dev
 sudo apt install python3-pip python3-virtualenv -y
@@ -42,6 +45,7 @@ pip install -r requirements.txt
 ```
 
 Create autostart for LXDE desktop
+
 ```bash
 mkdir /home/mark/.config/autostart
 nano /home/mark/.config/autostart/music.desktop
@@ -52,8 +56,10 @@ nano /home/mark/.config/autostart/music.desktop
 ```
 
 ```bash
+
 nano .config/lxsession/LXDE-pi/autostart
 ```
+
 or
 
 ```bash
@@ -61,6 +67,7 @@ sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
 ```
 
 Add entry
+
 ```
 @bash /home/mark/pi-mpd-touchscreen/run.sh
 ```
@@ -68,20 +75,25 @@ Add entry
 ### KDE Connect
 
 Create autostart link
+
 ```
 mkdir /home/mark/.config/autostart
 nano /home/mark/.config/autostart/kdeconnect.desktop
 ```
+
 Add to file
+
 ```
 [Desktop Entry]
 Type=Application
 Name=KDE Connect
 Exec=/usr/bin/kdeconnect-indicator
 ```
+
 reboot
 
 Connect
+
 ```
 kdeconnect-cli -l
 kdeconnect-cli --pair --device <device-id>
