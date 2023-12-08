@@ -32,7 +32,7 @@ os.environ['SDL_AUDIODRIVER'] = 'dsp'
 import pygame
 
 # Sound spectrometer settings
-INPUT_DEVICE_INDEX = 4
+NAME_SOUND_DEVICE = 'default'
 INPUT_SOUND_RATE = 10000 # 44100
 INPUT_BLOCK_TIME = 0.005 # 30 ms
 
@@ -43,7 +43,8 @@ print(os.uname()[4])
 # Setting up touch screen, set if statement to true on Raspberry Pi
 if RUN_ON_RASPBERRY_PI:
     os.environ['SDL_FBDEV'] = '/dev/fb1'
-    INPUT_DEVICE_INDEX = 1
+    NAME_SOUND_DEVICE = 'bcm2835 headphones'
+
 
 # Display settings
 pygame.init() 	# Pygame initialization

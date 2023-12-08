@@ -3,8 +3,9 @@ import numpy as np
 import struct
 
 class AudioSpectrometer(object):
-    def __init__(self, block_time=0.005, sound_rate=10000):
+    def __init__(self, name_device='default', block_time=0.005, sound_rate=10000):
         self.pa = pyaudio.PyAudio()
+        self.name_device = name_device
         self.sound_rate = sound_rate
         self.frames_per_block = int(sound_rate * block_time)
         self.stream = self.open_sound_stream()
@@ -16,7 +17,7 @@ class AudioSpectrometer(object):
         device_index = None
         for i in range( self.pa.get_device_count() ):
             device_info = self.pa.get_device_info_by_index(i)
-            if device_info['name'].lower() == 'default':
+            if device_info['name'].lower() == self.name_device:
                 device_index = i
                 return device_index
         if device_index == None:

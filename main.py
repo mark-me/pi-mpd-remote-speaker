@@ -15,7 +15,7 @@ async def main():
             mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
         sys.exit()
     pygame.init()
-    screen_player = ScreenPlayer(SCREEN)
+    screen_player = ScreenPlayer(SCREEN, name_sound_device=NAME_SOUND_DEVICE)
     await screen_player.show()
 
 

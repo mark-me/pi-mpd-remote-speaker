@@ -16,6 +16,7 @@ async def main_screen(stdscr):
             mpd.port) + "! Check settings in file pi-jukebox.conf or check is server is running 'systemctl status mpd'.")
         sys.exit()
 
+    stdscr.clear()    
     while True:
         stdscr.clear()
         task_get_status = asyncio.create_task(mpd.status_get())
@@ -25,14 +26,13 @@ async def main_screen(stdscr):
             event = mpd.events.popleft()
             playing = mpd.now_playing
             if event == 'time_elapsed':
-                #pbar.update(playing.time_percentage)
                 stdscr.addstr(12, 10, "Time elapsed: " + str(playing.time_percentage))
             if event == 'playing_file':
                 stdscr.addstr(14, 10, 'Title: ' + mpd.now_playing.title)
                 stdscr.addstr(15, 10, 'Artist: ' + mpd.now_playing.artist)
             if event == 'album_change':
                 file_img_cover = await mpd.now_playing.get_cover_art()
-                #print('Cover file: ' + file_img_cover)
+                stdscr.addstr(16, 10, 'Cover file: ' + file_img_cover)
         except IndexError:
             pass
         amplitude = round(audio_spectrometer.listen())

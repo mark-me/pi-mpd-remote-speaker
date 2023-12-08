@@ -33,7 +33,7 @@ logging.info("ScreenPlaying definition")
 class ScreenPlayer(Screen):
     """ Screen cover art
     """
-    def __init__(self, screen_surface):
+    def __init__(self, screen_surface, name_sound_device):
         Screen.__init__(self, screen_surface)
         self.timer = pygame.time.get_ticks
         self.blank_screen_time = self.timer() + BLANK_PERIOD
@@ -41,8 +41,10 @@ class ScreenPlayer(Screen):
         self.file_img_cover = 'default_cover_art.png'
         self.coverart_color = 0
         self.amplitude = 0
-        self.audio_spectrometer = AudioSpectrometer(block_time=INPUT_BLOCK_TIME,
-                                                    sound_rate=INPUT_SOUND_RATE)
+        self.audio_spectrometer = AudioSpectrometer(name_device=name_sound_device,
+                                                    block_time=INPUT_BLOCK_TIME,
+                                                    sound_rate=INPUT_SOUND_RATE
+                                                    )
         self.add_component(Picture(name='pic_background', surface=self.surface,
                                    surface_pos=(0, 0), widget_dims =(SCREEN_WIDTH, SCREEN_HEIGHT), image_file='background.png'))
         picture_pos = (((SCREEN_WIDTH/2)-(SCREEN_HEIGHT/2) + 15), 25)
