@@ -139,14 +139,14 @@ class MPDNowPlaying(object):
             binary = cover['binary']
             logging.info("End first try to get cover art")
         except:
-            try:
+"""             try:
                 logging.warning("Could not retrieve album cover using albumart() of %s", uri)
                 cover = await self.__mpd_client.readpicture(uri)
                 binary = cover['binary']
                 logging.info("After second try to get cover art using readpicture() of %s", uri)
-            except:
-                logging.warning("Could not retrieve album cover of %s", uri)
-                binary = None
+            except: """
+            logging.warning("Could not retrieve album cover of %s", uri)
+            binary = None
         return binary
 
     async def get_cover_art(self):
