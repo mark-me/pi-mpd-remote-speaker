@@ -4,6 +4,8 @@ A Raspberry Pi view on what is being played by a MPD server. Used in combination
 
 ## Install OH-MY-ZSH
 
+Why? Does it add to the functionality? No. It's just nice to have ;-).
+
 ```bash
 sudo apt install curl wget git
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -13,6 +15,8 @@ nano ~/.zshrc
 ```
 
 ## Install snapclient
+
+This does add to the functionality: it is the service that picks up playing music streams for multi-room audio.
 
 ```bash
 sudo apt install snapclient -y
