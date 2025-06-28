@@ -308,4 +308,4 @@ class MPDController(object):
 
 
 logging.info("Start mpd controller")
-mpd = MPDController(host='192.168.0.25')
+mpd = MPDController(host='osmc.tailf8cbd.ts.net')
